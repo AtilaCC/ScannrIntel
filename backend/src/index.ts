@@ -27,7 +27,7 @@ import { initSubscriptionMiddleware } from './middleware/subscription';
 import { tradingEngineRouter } from './routes/tradingEngine';
 
 import { WSManager } from './services/wsManager';
-import { REDIS_CHANNELS } from '../../shared/src/constants';
+import { REDIS_CHANNELS } from './utils/shared';
 import { createSessionService } from './services/sessionService';
 import { PrismaClient } from '@prisma/client';
 

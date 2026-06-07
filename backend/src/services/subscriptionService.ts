@@ -9,7 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import {
   PlanTier, BillingInterval, PLANS, isUpgrade, isDowngrade,
 } from '../config/plans';
-import { createLogger } from '../../../shared/src/utils';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('subscription-service');
 

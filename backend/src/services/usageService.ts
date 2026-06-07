@@ -13,7 +13,7 @@
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import { PlanTier, getFeature, withinLimit, PLANS } from '../config/plans';
-import { createLogger } from '../../../shared/src/utils';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('usage-service');
 

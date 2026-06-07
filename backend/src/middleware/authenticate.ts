@@ -15,7 +15,7 @@ import Redis from 'ioredis';
 import { tokenService, AccessTokenPayload } from '../services/tokenService';
 import { createApiKeyService } from '../services/apiKeyService';
 import { AppError } from './errorHandler';
-import { createLogger } from '../../../shared/src/utils';
+import { createLogger } from '../utils/shared';
 import jwt from 'jsonwebtoken';
 
 const logger = createLogger('authenticate');

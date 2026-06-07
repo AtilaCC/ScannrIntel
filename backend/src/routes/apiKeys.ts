@@ -16,7 +16,7 @@ import { z } from 'zod';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/authenticate';
 import { AppError } from '../middleware/errorHandler';
 import { createApiKeyService } from '../services/apiKeyService';
-import { createLogger } from '../../../shared/src/utils';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('api-key-routes');
 

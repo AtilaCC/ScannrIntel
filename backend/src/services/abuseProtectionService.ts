@@ -8,7 +8,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
-import { createLogger } from '../../../shared/src/utils';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('abuse-protection');
 

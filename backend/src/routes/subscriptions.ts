@@ -22,7 +22,7 @@ import { createSubscriptionService } from '../services/subscriptionService';
 import { createUsageService }        from '../services/usageService';
 import { PLANS, PlanTier, BillingInterval } from '../config/plans';
 import { z } from 'zod';
-import { createLogger } from '../../../shared/src/utils';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('subscription-routes');
 

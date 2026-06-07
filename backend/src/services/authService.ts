@@ -5,8 +5,8 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config';
-import { JWTPayload } from '../../../shared/src/types';
-import { JWT_CONFIG } from '../../../shared/src/constants';
+import { JWTPayload } from '../utils/shared';
+import { JWT_CONFIG } from '../utils/shared';
 
 export const authService = {
   async hashPassword(password: string): Promise<string> {

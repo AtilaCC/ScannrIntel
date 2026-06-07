@@ -10,7 +10,7 @@ import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 import { PlanTier, getFeature } from '../config/plans';
 import { AppError } from '../middleware/errorHandler';
-import { createLogger } from '../../../shared/src/utils';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('api-key-service');
 

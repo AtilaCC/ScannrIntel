@@ -6,7 +6,7 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { config } from '../config';
-import { JWT_CONFIG } from '../../../shared/src/constants';
+import { JWT_CONFIG } from '../utils/shared';
 
 export interface AccessTokenPayload {
   sub: string;     // userId

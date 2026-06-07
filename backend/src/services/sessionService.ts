@@ -5,7 +5,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { tokenService } from './tokenService';
-import { createLogger } from '../../../shared/src/utils';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('session-service');
 

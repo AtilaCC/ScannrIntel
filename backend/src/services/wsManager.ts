@@ -7,7 +7,7 @@ import { IncomingMessage } from 'http';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
 import { logger } from '../utils/logger';
-import { JWTPayload } from '../../../shared/src/types';
+import { JWTPayload } from '../utils/shared';
 
 interface AuthenticatedClient {
   ws: WebSocket;
