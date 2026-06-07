@@ -1,0 +1,311 @@
+// ============================================================
+// PRISMA SCHEMA — PostgreSQL
+// Full production schema with auth, sessions, tokens, signals,
+// AI insights, alerts, watchlists, audit log, and preferences
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// USERS
+// ─────────────────────────────────────────────────────────────
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  role         Role      @default(USER)
+  isActive     Boolean   @default(true) @map("is_active")
+  isVerified   Boolean   @default(false) @map("is_verified")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  lastLoginAt  DateTime? @map("last_login_at")
+
+  // Relations
+  sessions        Session[]
+  preferences     UserPreferences?
+  alerts          AlertConfig[]
+  triggeredAlerts TriggeredAlert[]
+  watchlist       Watchlist[]
+  passwordResets  PasswordReset[]
+  auditLogs       AuditLog[]
+
+  @@index([email])
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+// ─────────────────────────────────────────────────────────────
+// USER PREFERENCES
+// ─────────────────────────────────────────────────────────────
+model UserPreferences {
+  id                 String   @id @default(uuid())
+  userId             String   @unique @map("user_id")
+  telegramChatId     String?  @map("telegram_chat_id")
+  emailNotifications Boolean  @default(true) @map("email_notifications")
+  theme              String   @default("dark")
+  defaultPairs       String[] @map("default_pairs")
+  timezone           String   @default("UTC")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+// ─────────────────────────────────────────────────────────────
+// SESSIONS (refresh token store)
+// ─────────────────────────────────────────────────────────────
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  refreshToken String   @unique @map("refresh_token")
+  userAgent    String?  @map("user_agent")
+  ipAddress    String?  @map("ip_address")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  lastUsedAt   DateTime @default(now()) @map("last_used_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// PASSWORD RESETS
+// ─────────────────────────────────────────────────────────────
+model PasswordReset {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("password_resets")
+}
+
+// ─────────────────────────────────────────────────────────────
+// AUDIT LOG
+// ─────────────────────────────────────────────────────────────
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  action     String
+  resource   String
+  resourceId String?  @map("resource_id")
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ─────────────────────────────────────────────────────────────
+// TOKENS (tracked crypto assets)
+// ─────────────────────────────────────────────────────────────
+model Token {
+  id         String  @id @default(uuid())
+  symbol     String  @unique
+  baseAsset  String  @map("base_asset")
+  quoteAsset String  @map("quote_asset")
+  network    String  @default("binance")
+  isActive   Boolean @default(true) @map("is_active")
+
+  // Market snapshot (written by scanner)
+  lastPrice    Float?   @map("last_price")
+  priceChange  Float?   @map("price_change")
+  volumeUsd24h Float?   @map("volume_usd_24h")
+  high24h      Float?   @map("high_24h")
+  low24h       Float?   @map("low_24h")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  signals    Signal[]
+  insights   AIInsight[]
+  watchlists Watchlist[]
+
+  @@index([symbol])
+  @@index([isActive])
+  @@map("tokens")
+}
+
+// ─────────────────────────────────────────────────────────────
+// SIGNALS (processor engine output)
+// ─────────────────────────────────────────────────────────────
+model Signal {
+  id            String        @id @default(uuid())
+  symbol        String
+  type          SignalType
+  severity      SignalSeverity
+  data          Json
+  metadata      Json
+  processedByAI Boolean       @default(false) @map("processed_by_ai")
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  token    Token       @relation(fields: [symbol], references: [symbol])
+  insights AIInsight[]
+
+  @@index([symbol])
+  @@index([type])
+  @@index([severity])
+  @@index([createdAt])
+  @@index([processedByAI])
+  @@map("signals")
+}
+
+enum SignalType {
+  WHALE_TRADE
+  VOLUME_SPIKE
+  PRICE_SURGE
+  PRICE_CRASH
+  LIQUIDITY_ANOMALY
+  ACCUMULATION_PATTERN
+  DUMP_PATTERN
+}
+
+enum SignalSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ─────────────────────────────────────────────────────────────
+// AI INSIGHTS
+// ─────────────────────────────────────────────────────────────
+model AIInsight {
+  id               String    @id @default(uuid())
+  signalId         String    @map("signal_id")
+  symbol           String
+  summary          String
+  details          String    @db.Text
+  riskScore        Int       @map("risk_score")
+  opportunityScore Int       @map("opportunity_score")
+  sentiment        Sentiment
+  tags             String[]
+  recommendations  String[]
+  confidence       Float
+  modelVersion     String    @default("claude-sonnet-4-20250514") @map("model_version")
+  promptTokens     Int?      @map("prompt_tokens")
+  completionTokens Int?      @map("completion_tokens")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  signal Signal @relation(fields: [signalId], references: [id])
+  token  Token  @relation(fields: [symbol], references: [symbol])
+
+  @@index([symbol])
+  @@index([signalId])
+  @@index([sentiment])
+  @@index([createdAt])
+  @@map("ai_insights")
+}
+
+enum Sentiment {
+  BULLISH
+  BEARISH
+  NEUTRAL
+}
+
+// ─────────────────────────────────────────────────────────────
+// ALERT CONFIGURATIONS
+// ─────────────────────────────────────────────────────────────
+model AlertConfig {
+  id        String         @id @default(uuid())
+  userId    String         @map("user_id")
+  symbol    String
+  condition AlertCondition
+  threshold Float
+  isActive  Boolean        @default(true) @map("is_active")
+  channels  AlertChannel[]
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  triggered TriggeredAlert[]
+
+  @@index([userId])
+  @@index([symbol])
+  @@index([isActive])
+  @@map("alert_configs")
+}
+
+enum AlertCondition {
+  PRICE_ABOVE
+  PRICE_BELOW
+  VOLUME_SPIKE_PERCENT
+  PRICE_CHANGE_PERCENT
+  WHALE_TRADE_SIZE
+}
+
+enum AlertChannel {
+  IN_APP
+  EMAIL
+  TELEGRAM
+}
+
+// ─────────────────────────────────────────────────────────────
+// TRIGGERED ALERTS (notification history)
+// ─────────────────────────────────────────────────────────────
+model TriggeredAlert {
+  id            String         @id @default(uuid())
+  alertConfigId String         @map("alert_config_id")
+  userId        String         @map("user_id")
+  symbol        String
+  condition     AlertCondition
+  triggerValue  Float          @map("trigger_value")
+  threshold     Float
+  message       String
+  isRead        Boolean        @default(false) @map("is_read")
+  readAt        DateTime?      @map("read_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+
+  alertConfig AlertConfig @relation(fields: [alertConfigId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("triggered_alerts")
+}
+
+// ─────────────────────────────────────────────────────────────
+// WATCHLIST
+// ─────────────────────────────────────────────────────────────
+model Watchlist {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  symbol    String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token Token @relation(fields: [symbol], references: [symbol])
+
+  @@unique([userId, symbol])
+  @@index([userId])
+  @@map("watchlists")
+}

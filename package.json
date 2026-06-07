@@ -1,0 +1,29 @@
+{
+  "name": "crypto-intelligence-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise-grade AI-powered crypto intelligence platform",
+  "scripts": {
+    "setup": "bash infrastructure/scripts/setup.sh",
+    "dev": "bash infrastructure/scripts/dev.sh",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "migrate": "cd backend && npx prisma migrate deploy",
+    "migrate:dev": "cd backend && npx prisma migrate dev",
+    "generate": "cd backend && npx prisma generate",
+    "build:all": "npm run build --workspaces",
+    "lint:all": "npm run lint --workspaces"
+  },
+  "workspaces": [
+    "backend",
+    "frontend",
+    "scanner-service",
+    "processor-engine",
+    "ai-service"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}
