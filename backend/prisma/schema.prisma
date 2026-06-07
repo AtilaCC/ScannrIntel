@@ -436,3 +436,19 @@ model AbuseLog {
   @@index([createdAt])
   @@map("abuse_logs")
 }
+
+// ─────────────────────────────────────────────────────────────
+// USAGE RECORDS
+// ─────────────────────────────────────────────────────────────
+model UsageRecord {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  endpoint  String
+  count     Int      @default(1)
+  date      DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([date])
+  @@map("usage_records")
+}
