@@ -55,3 +55,5 @@ export function apiKeyRateLimiter() {
 export function loginBruteForce() {
   return (_req: Request, _res: Response, next: NextFunction) => next();
 }
+
+export const rateLimiter = globalRateLimiter();
