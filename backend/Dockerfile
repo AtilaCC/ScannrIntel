@@ -9,8 +9,9 @@ RUN npm install
 
 COPY . .
 RUN npx prisma generate
+RUN npx tsc --skipLibCheck || true
 
 EXPOSE 4000
 ENV PORT=4000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npx ts-node --skipProject --transpile-only src/index.ts"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
