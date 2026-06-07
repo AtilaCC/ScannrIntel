@@ -12,7 +12,7 @@ import { WebSocketServer } from 'ws';
 
 import { config } from './config';
 import { logger } from './utils/logger';
-import { connectRedis, redisSubscriber } from './config/redis';
+import { connectRedis, redisSubscriber, redis } from './config/redis';
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
 
