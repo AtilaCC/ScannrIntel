@@ -2,7 +2,6 @@ FROM node:20-alpine
 WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_ENV=production
 
 COPY package*.json ./
 RUN npm install
@@ -13,12 +12,13 @@ ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_WS_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
+ENV NODE_ENV=production
+ENV PORT=3000
 
-RUN npm run build || true
+RUN npm run build
 
 EXPOSE 3000
-ENV PORT=3000
 
 HEALTHCHECK NONE
 
-CMD ["npm", "start"]
+CMD ["./node_modules/.bin/next", "start", "-p", "3000"]
