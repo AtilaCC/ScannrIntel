@@ -19,6 +19,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-HEALTHCHECK NONE
-
-CMD ["./node_modules/.bin/next", "start", "-p", "3000"]
+CMD ["npx", "next", "start", "-p", "3000"]
