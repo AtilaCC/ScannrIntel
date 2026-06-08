@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Zap, Brain, Bell, Activity } from 'lucide-react';
-import { useMarketStore } from '../store/marketStore';
-import { useAuthStore } from '../store/authStore';
-import { insightApi, signalApi, alertApi, tokenApi } from '../lib/api';
-import { TokenTable } from '../components/scanner/TokenTable';
-import { AIInsightsFeed } from '../components/insights/AIInsightsFeed';
-import { SignalFeed } from '../components/scanner/SignalFeed';
-import { MiniPriceChart } from '../components/scanner/MiniPriceChart';
-import { StatCard } from '../components/ui/StatCard';
+import { useMarketStore } from '@/store/marketStore';
+import { useAuthStore } from '@/store/authStore';
+import { insightApi, signalApi, alertApi, tokenApi } from '@/lib/api';
+import { TokenTable } from '@/components/scanner/TokenTable';
+import { AIInsightsFeed } from '@/components/insights/AIInsightsFeed';
+import { SignalFeed } from '@/components/scanner/SignalFeed';
+import { MiniPriceChart } from '@/components/scanner/MiniPriceChart';
+import { StatCard } from '@/components/ui/StatCard';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();

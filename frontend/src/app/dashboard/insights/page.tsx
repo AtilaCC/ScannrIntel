@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, RefreshCw, Filter } from 'lucide-react';
-import { insightApi } from '../../lib/api';
-import { useMarketStore } from '../../store/marketStore';
-import { AIInsightsFeed } from '../../components/insights/AIInsightsFeed';
+import { insightApi } from '@/lib/api';
+import { useMarketStore } from '@/store/marketStore';
+import { AIInsightsFeed } from '@/components/insights/AIInsightsFeed';
 import { toast } from 'sonner';
 
 const SYMBOLS = ['All', 'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT'];

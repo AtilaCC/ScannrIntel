@@ -6,8 +6,8 @@ import {
   CreditCard, Zap, Shield, BarChart2, Bell, Brain,
   CheckCircle, XCircle, RefreshCw, ExternalLink, AlertTriangle,
 } from 'lucide-react';
-import { api } from '../../lib/api';
-import { useAuthStore } from '../../store/authStore';
+import { api } from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 
 // ── Types ────────────────────────────────────────────────────

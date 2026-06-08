@@ -6,11 +6,11 @@ import {
   ShieldAlert, TrendingUp, RefreshCw, ArrowUpDown,
   Brain, Activity, Trophy, Zap,
 } from 'lucide-react';
-import { ScoreMeter } from '../../components/insights/ScoreMeter';
-import { UpgradePrompt } from '../../components/billing/PlanBadge';
-import { api } from '../../lib/api';
-import { useMarketStore } from '../../store/marketStore';
-import { useAuthStore } from '../../store/authStore';
+import { ScoreMeter } from '@/components/insights/ScoreMeter';
+import { UpgradePrompt } from '@/components/billing/PlanBadge';
+import { api } from '@/lib/api';
+import { useMarketStore } from '@/store/marketStore';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 
 // ── Types ─────────────────────────────────────────────────────

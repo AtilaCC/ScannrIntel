@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, TrendingUp, BarChart2, RefreshCw } from 'lucide-react';
-import { useMarketStore } from '../../store/marketStore';
-import { tokenApi, signalApi } from '../../lib/api';
-import { TokenTable } from '../../components/scanner/TokenTable';
-import { SignalFeed } from '../../components/scanner/SignalFeed';
+import { useMarketStore } from '@/store/marketStore';
+import { tokenApi, signalApi } from '@/lib/api';
+import { TokenTable } from '@/components/scanner/TokenTable';
+import { SignalFeed } from '@/components/scanner/SignalFeed';
 
 export default function ScannerPage() {
   const { tickers, signals } = useMarketStore();

@@ -6,8 +6,8 @@ import {
   Clock, Target, AlertTriangle, ChevronRight, RotateCcw,
   Loader2, Sparkles, History, Send,
 } from 'lucide-react';
-import { tradingEngineApi } from '../../lib/api';
-import { useAuthStore } from '../../store/authStore';
+import { tradingEngineApi } from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ── Types ─────────────────────────────────────────────────────

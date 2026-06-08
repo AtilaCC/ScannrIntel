@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, CheckCheck } from 'lucide-react';
-import { alertApi } from '../../lib/api';
-import { useMarketStore } from '../../store/marketStore';
+import { alertApi } from '@/lib/api';
+import { useMarketStore } from '@/store/marketStore';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 

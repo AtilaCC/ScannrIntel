@@ -8,10 +8,10 @@ import {
   Zap, LayoutDashboard, TrendingUp, Brain, Bell,
   Settings, LogOut, Wifi, WifiOff, Menu, X, ChevronRight, BarChart2, CreditCard, Crosshair,
 } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
-import { PlanBadge } from '../components/billing/PlanBadge';
-import { useWebSocket } from '../hooks/useWebSocket';
-import { useMarketStore } from '../store/marketStore';
+import { useAuthStore } from '@/store/authStore';
+import { PlanBadge } from '@/components/billing/PlanBadge';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { useMarketStore } from '@/store/marketStore';
 import { toast } from 'sonner';
 
 const NAV_ITEMS = [
