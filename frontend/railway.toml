@@ -1,11 +1,7 @@
 [build]
-builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+builder = "NIXPACKS"
 
 [deploy]
-startCommand = "node server.js"
+startCommand = "npx next start -p 3000"
 healthcheckPath = "/"
 healthcheckTimeout = 300
-
-[[services]]
-name = "crypto-frontend"
