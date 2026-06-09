@@ -1,0 +1,13 @@
+export const DEFAULT_PAIRS = [
+  'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT',
+  'ADAUSDT', 'AVAXUSDT', 'DOTUSDT', 'MATICUSDT', 'LINKUSDT',
+  'UNIUSDT', 'ATOMUSDT', 'LTCUSDT', 'ETCUSDT', 'XLMUSDT',
+  'ALGOUSDT', 'VETUSDT', 'FILUSDT', 'TRXUSDT', 'NEARUSDT',
+];
+
+export const REDIS_CHANNELS = {
+  SIGNALS: 'signals',
+  MARKET_DATA: 'market_data',
+  AI_INSIGHTS: 'ai_insights',
+  WHALE_ALERTS: 'whale_alerts',
+};

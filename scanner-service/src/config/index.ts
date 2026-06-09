@@ -3,7 +3,7 @@
 // ============================================================
 
 import { ScannerConfig } from '../types';
-import { DEFAULT_PAIRS } from '../../../../shared/src/constants';
+import { DEFAULT_PAIRS } from '../utils/constants';
 
 function parseSymbols(): string[] {
   const raw = process.env.SCAN_SYMBOLS || DEFAULT_PAIRS.join(',');
