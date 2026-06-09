@@ -19,3 +19,7 @@ export const REDIS_CHANNELS = {
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+export const generateId = (): string => {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+};
