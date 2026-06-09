@@ -357,3 +357,32 @@ Always respond with valid JSON matching this format:
   // PRO and ENTERPRISE get the full institutional system prompt
   return SCANNRINTEL_SYSTEM_PROMPT;
 };
+
+// ─────────────────────────────────────────────────────────────
+// PROMPT SELECTOR — routes to correct prompt based on context
+// ─────────────────────────────────────────────────────────────
+import { SCANNRINTEL_OMEGA_PROMPT, getCurrentMaturityLevel } from './omegaPrompt';
+
+export type PromptMode = 'signal' | 'audit' | 'omega' | 'free';
+
+export const getPromptForContext = (plan: string, mode: PromptMode): string => {
+  switch (mode) {
+    case 'omega':
+      return SCANNRINTEL_OMEGA_PROMPT;
+    case 'audit':
+      return SCANNRINTEL_SYSTEM_PROMPT;
+    case 'free':
+      return getSystemPromptForPlan('FREE');
+    case 'signal':
+    default:
+      return getSystemPromptForPlan(plan);
+  }
+};
+
+export const getMaturityReport = () => ({
+  level: getCurrentMaturityLevel(),
+  description: 'Multi-factor intelligence',
+  nextTarget: 'Quantitative decision engine',
+  bottleneck: 'Scanner Service + AI Service not yet deployed',
+  highestROIUpgrade: 'Deploy Scanner + AI Service with live Binance data',
+});
