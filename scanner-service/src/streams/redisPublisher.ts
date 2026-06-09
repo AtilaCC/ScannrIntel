@@ -6,8 +6,8 @@
 // ============================================================
 
 import Redis from 'ioredis';
-import { REDIS_CHANNELS } from '../../../../shared/src/constants';
-import { createLogger } from '../../../../shared/src/utils';
+import { REDIS_CHANNELS } from '../utils/constants';
+import { createLogger } from '../utils/constants';
 import { MetricsCollector } from '../metrics/metricsCollector';
 
 const logger = createLogger('redis-publisher');

@@ -9,7 +9,7 @@
 //   HALF_OPEN → probe period: allow one attempt to test recovery
 // ============================================================
 
-import { createLogger } from '../../../../shared/src/utils';
+import { createLogger } from '../utils/constants';
 
 const logger = createLogger('circuit-breaker');
 

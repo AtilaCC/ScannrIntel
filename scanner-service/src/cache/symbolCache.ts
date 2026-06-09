@@ -9,8 +9,8 @@
 
 import Redis from 'ioredis';
 import { NormalizedTicker, NormalizedBookTicker, NormalizedTrade } from '../types';
-import { REDIS_CHANNELS } from '../../../../shared/src/constants';
-import { createLogger } from '../../../../shared/src/utils';
+import { REDIS_CHANNELS } from '../utils/constants';
+import { createLogger } from '../utils/constants';
 
 const logger = createLogger('symbol-cache');
 

@@ -15,7 +15,7 @@ import { BinanceStreamManager } from '../streams/binanceStreamManager';
 import { MetricsCollector } from '../metrics/metricsCollector';
 import { SymbolCache } from '../cache/symbolCache';
 import { CandleAggregator } from '../aggregators/candleAggregator';
-import { createLogger } from '../../../../shared/src/utils';
+import { createLogger } from '../utils/constants';
 
 const logger = createLogger('health-server');
 
