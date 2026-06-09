@@ -7,7 +7,7 @@
 // timestamp and token count in a rolling 60-second window.
 // ============================================================
 
-import { createLogger, sleep } from '../../utils/shared';
+import { createLogger, sleep } from '../utils/shared';
 
 const logger = createLogger('rate-limiter');
 

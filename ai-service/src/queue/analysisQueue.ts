@@ -6,8 +6,8 @@ import Redis from 'ioredis';
 import { ClaudeAnalyzer } from '../analyzers/claudeAnalyzer';
 import { config } from '../config';
 import { QueueItem, DeadLetterItem, QueuePriority } from '../types';
-import { REDIS_CHANNELS } from '../../utils/shared';
-import { createLogger, sleep, generateId } from '../../utils/shared';
+import { REDIS_CHANNELS } from '../utils/shared';
+import { createLogger, sleep, generateId } from '../utils/shared';
 
 const logger = createLogger('analysis-queue');
 

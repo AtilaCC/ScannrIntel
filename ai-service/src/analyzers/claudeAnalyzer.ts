@@ -23,9 +23,9 @@ import { TokenScorer } from '../scoring/tokenScorer';
 import { ScoreAggregator } from '../scoring/scoreAggregator';
 import { TokenScoreStore } from '../scoring/tokenScoreStore';
 import { config, SEVERITY_PRIORITY } from '../config';
-import { REDIS_CHANNELS } from '../../utils/shared';
+import { REDIS_CHANNELS } from '../utils/shared';
 import { QueueItem, ClassifiedError, TokenScore } from '../types';
-import { createLogger, generateId, sleep } from '../../utils/shared';
+import { createLogger, generateId, sleep } from '../utils/shared';
 
 const logger = createLogger('claude-analyzer');
 

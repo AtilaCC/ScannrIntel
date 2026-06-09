@@ -9,7 +9,7 @@ import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { ClaudeAnalyzer } from '../analyzers/claudeAnalyzer';
 import { AlertChecker } from '../analyzers/alertChecker';
 import { AnalysisQueue } from '../queue/analysisQueue';
-import { createLogger } from '../../utils/shared';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('ai-health-server');
 

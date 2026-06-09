@@ -9,7 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import { DbSignal, MarketContext } from '../types';
 import { config } from '../config';
-import { createLogger } from '../../utils/shared';
+import { createLogger } from '../utils/shared';
 
 const logger = createLogger('context-enricher');
 

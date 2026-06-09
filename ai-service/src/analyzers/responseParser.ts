@@ -6,7 +6,7 @@
 // ============================================================
 
 import { ParsedInsight, ClassifiedError } from '../types';
-import { createLogger } from '../../utils/shared';
+import { createLogger } from '../utils/shared';
 import { DbSignal } from '../types';
 
 const logger = createLogger('response-parser');
