@@ -26,7 +26,7 @@ import {
   NormalizedKline,
   NormalizedBookTicker,
 } from './types';
-import { createLogger } from '../utils/constants';
+import { createLogger } from './utils/constants';
 
 const logger = createLogger('scanner-service');
 
