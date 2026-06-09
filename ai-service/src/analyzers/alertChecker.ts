@@ -12,10 +12,10 @@
 
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
-import { REDIS_CHANNELS } from '../../../../shared/src/constants';
+import { REDIS_CHANNELS } from '../../utils/shared';
 import { config } from '../config';
 import { NotificationPayload } from '../types';
-import { createLogger, generateId } from '../../../../shared/src/utils';
+import { createLogger, generateId } from '../../utils/shared';
 
 const logger = createLogger('alert-checker');
 

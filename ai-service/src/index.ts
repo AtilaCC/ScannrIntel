@@ -20,8 +20,8 @@ import { ClaudeAnalyzer } from './analyzers/claudeAnalyzer';
 import { AlertChecker } from './analyzers/alertChecker';
 import { AnalysisQueue } from './queue/analysisQueue';
 import { createHealthServer } from './health/healthServer';
-import { REDIS_CHANNELS } from '../../shared/src/constants';
-import { createLogger } from '../../shared/src/utils';
+import { REDIS_CHANNELS } from './utils/shared';
+import { createLogger } from './utils/shared';
 
 const logger    = createLogger('ai-service');
 const startedAt = Date.now();

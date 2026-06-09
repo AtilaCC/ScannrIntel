@@ -18,7 +18,7 @@ import {
   TokenUsage,
 } from '../types';
 import { config, TOKEN_COST } from '../config';
-import { createLogger } from '../../../../shared/src/utils';
+import { createLogger } from '../../utils/shared';
 
 const logger = createLogger('claude-client');
 

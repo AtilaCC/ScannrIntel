@@ -15,7 +15,7 @@
 import Redis from 'ioredis';
 import { PrismaClient } from '@prisma/client';
 import { TokenScore, ScoreBreakdown } from '../types';
-import { createLogger } from '../../../../shared/src/utils';
+import { createLogger } from '../../utils/shared';
 
 const logger = createLogger('score-store');
 
