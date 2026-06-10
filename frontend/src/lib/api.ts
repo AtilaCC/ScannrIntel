@@ -25,6 +25,54 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Auto refresh token on 401
+let isRefreshing = false;
+let refreshQueue: ((token: string) => void)[] = [];
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshQueue.push((token) => {
+            original.headers.Authorization = `Bearer ${token}`;
+            resolve(api(original));
+          });
+        });
+      }
+      isRefreshing = true;
+      try {
+        const stored = localStorage.getItem('crypto-intel-auth');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const refreshToken = parsed?.state?.refreshToken;
+          if (refreshToken) {
+            const res = await axios.post(`${API_URL}/api/v1/auth/refresh`, { refreshToken });
+            const newToken = res.data?.data?.accessToken;
+            if (newToken) {
+              parsed.state.accessToken = newToken;
+              localStorage.setItem('crypto-intel-auth', JSON.stringify(parsed));
+              refreshQueue.forEach((cb) => cb(newToken));
+              refreshQueue = [];
+              original.headers.Authorization = `Bearer ${newToken}`;
+              return api(original);
+            }
+          }
+        }
+      } catch {
+        // refresh failed — redirect to login
+        if (typeof window !== 'undefined') window.location.href = '/auth/login';
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ── API Methods ───────────────────────────────────────────
 
 export const tokenApi = {
