@@ -24,7 +24,7 @@ export class WSManager {
   constructor(private readonly wss: WebSocketServer) {
     this.wss.on('connection', this.handleConnection.bind(this));
 
-    // Heartbeat — remove dead connections every 30s
+    // Heartbeat — remove dead connections every 60s
     this.heartbeatInterval = setInterval(() => {
       this.clients.forEach((client, id) => {
         if (!client.isAlive) {
@@ -35,7 +35,7 @@ export class WSManager {
         client.isAlive = false;
         client.ws.ping();
       });
-    }, 30_000);
+    }, 60_000);
 
     logger.info('WebSocket manager initialized');
   }

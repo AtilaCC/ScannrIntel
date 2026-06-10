@@ -57,7 +57,7 @@ export function useWebSocket(onMessage: MessageHandler): UseWebSocketReturn {
           if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'ping' }));
           }
-        }, 20000);
+        }, 25000);
       };
 
       ws.onmessage = (event) => {
