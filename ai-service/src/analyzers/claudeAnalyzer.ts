@@ -27,7 +27,7 @@ import { REDIS_CHANNELS } from '../utils/shared';
 import { QueueItem, ClassifiedError, TokenScore } from '../types';
 import { createLogger, generateId, sleep } from '../utils/shared';
 
-const logger = createLogger('claude-analyzer');
+const logger = createLogger('groq-analyzer');
 
 // How long to wait between retries per error type
 const RETRY_DELAYS: Record<string, number> = {
@@ -53,7 +53,7 @@ export class ClaudeAnalyzer {
     private readonly prisma: PrismaClient,
     private readonly redis:  Redis,
   ) {
-    this.client     = new ClaudeClient(config.anthropicApiKey);
+    this.client     = new ClaudeClient(config.anthropicApiKey); // reads GROQ_API_KEY via config
     this.limiter    = new TokenRateLimiter(config.rateLimitRpm, config.rateLimitTpm);
     this.enricher   = new ContextEnricher(prisma, redis);
     this.scorer     = new TokenScorer();
@@ -237,7 +237,7 @@ export class ClaudeAnalyzer {
 
         // Non-retryable errors — fail immediately
         if (!lastError.retryable) {
-          logger.error('Non-retryable Claude error', {
+          logger.error('Non-retryable Groq error', {
             signalId,
             errorType: lastError.type,
             message:   lastError.message,
@@ -249,7 +249,7 @@ export class ClaudeAnalyzer {
           ?? RETRY_DELAYS[lastError.type]
           ?? config.queueRetryBaseMs * Math.pow(2, attempt - 1);
 
-        logger.warn('Claude API error — will retry', {
+        logger.warn('Groq API error — will retry', {
           signalId,
           attempt,
           maxAttempts: config.queueMaxAttempts,
