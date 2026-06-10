@@ -122,6 +122,34 @@ async function bootstrap() {
   // ── Start queue workers ────────────────────────────────────
   queue.start(redisPub);
 
+  // ── Periodic forced analysis (every 10 min) ───────────────
+  const TOP_SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'];
+  
+  const forceAnalysis = async () => {
+    for (const symbol of TOP_SYMBOLS) {
+      await queue.enqueue({
+        signalId: `periodic-${symbol}-${Date.now()}`,
+        signal: {
+          id: `periodic-${symbol}-${Date.now()}`,
+          symbol,
+          type: 'PERIODIC_ANALYSIS',
+          severity: 'LOW',
+          price: 0,
+          priceChangePercent: 0,
+          volume: 0,
+          metadata: { source: 'periodic' },
+          timestamp: Date.now(),
+        },
+        enqueuedAt: Date.now(),
+      });
+    }
+    logger.info('Periodic analysis enqueued for top 5 symbols');
+  };
+
+  // Run immediately on start, then every 10 minutes
+  setTimeout(forceAnalysis, 30000);
+  setInterval(forceAnalysis, 10 * 60 * 1000);
+
   // ── Health server ──────────────────────────────────────────
   createHealthServer(config.port, analyzer, checker, queue, startedAt);
 
