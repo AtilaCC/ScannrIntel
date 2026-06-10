@@ -21,6 +21,7 @@ import { AlertChecker } from './analyzers/alertChecker';
 import { AnalysisQueue } from './queue/analysisQueue';
 import { createHealthServer } from './health/healthServer';
 import { REDIS_CHANNELS } from './utils/shared';
+import { SignalDetector } from './analyzers/signalDetector';
 import { createLogger } from './utils/shared';
 
 const logger    = createLogger('ai-service');
@@ -42,6 +43,8 @@ async function waitReady(redis: Redis, name: string): Promise<void> {
   await redis.ping();
   logger.info(`Redis [${name}] ready`);
 }
+
+const signalDetector = new SignalDetector();
 
 async function bootstrap() {
   logger.info('🤖 Starting CryptoIntel AI Service', {
@@ -82,9 +85,19 @@ async function bootstrap() {
     try {
       const event = JSON.parse(raw);
 
-      // ── Live market ticker → alert evaluation ──────────────
+      // ── Live market ticker → alert evaluation + signal detection ──
       if (channel === REDIS_CHANNELS.MARKET_DATA && event.type === 'ticker') {
         await checker.check(event.payload);
+        
+        // Detect signals from ticker data
+        const signal = signalDetector.detect(event.payload);
+        if (signal) {
+          await queue.enqueue({
+            signalId: signal.id,
+            signal,
+            enqueuedAt: Date.now(),
+          });
+        }
         return;
       }
 
