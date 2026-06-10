@@ -36,7 +36,7 @@ export class SignalDetector {
   private volumeHistory = new Map<string, number[]>();
   private priceHistory = new Map<string, number[]>();
   private lastSignal = new Map<string, number>();
-  private readonly SIGNAL_COOLDOWN_MS = 5 * 60 * 1000; // 5 min per symbol
+  private readonly SIGNAL_COOLDOWN_MS = 10 * 60 * 1000; // 10 min per symbol
 
   detect(ticker: Ticker): Signal | null {
     const now = Date.now();
@@ -58,7 +58,7 @@ export class SignalDetector {
     this.volumeHistory.set(ticker.symbol, volumes);
     this.priceHistory.set(ticker.symbol, prices);
 
-    if (volumes.length < 5) return null;
+    if (volumes.length < 3) return null;
 
     // Calculate averages
     const avgVolume = volumes.slice(0, -1).reduce((a, b) => a + b, 0) / (volumes.length - 1);
@@ -68,7 +68,7 @@ export class SignalDetector {
     let signal: Signal | null = null;
 
     // CRITICAL: Extreme price movement + high volume
-    if (priceChange > 8 && relativeVolume > 3) {
+    if (priceChange > 5 && relativeVolume > 2) {
       signal = {
         id: `${ticker.symbol}-${now}`,
         symbol: ticker.symbol,
@@ -82,7 +82,7 @@ export class SignalDetector {
       };
     }
     // HIGH: Strong price movement or volume spike
-    else if (priceChange > 5 || relativeVolume > 4) {
+    else if (priceChange > 3 || relativeVolume > 3) {
       signal = {
         id: `${ticker.symbol}-${now}`,
         symbol: ticker.symbol,
@@ -96,7 +96,7 @@ export class SignalDetector {
       };
     }
     // MEDIUM: Notable movement
-    else if (priceChange > 3 || relativeVolume > 2.5) {
+    else if (priceChange > 1.5 || relativeVolume > 1.8) {
       signal = {
         id: `${ticker.symbol}-${now}`,
         symbol: ticker.symbol,
