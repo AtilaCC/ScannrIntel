@@ -9,7 +9,6 @@
     "build": "npx tsc --skipLibCheck"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.20.0",
     "@prisma/client": "^5.7.0",
     "prisma": "^5.7.0",
     "ioredis": "^5.3.2",

@@ -30,15 +30,15 @@ export const config = {
   // Database
   databaseUrl: requireEnv('DATABASE_URL'),
 
-  // Anthropic
-  anthropicApiKey: requireEnv('ANTHROPIC_API_KEY'),
-  claudeModel:     process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514',
+  // Groq (migrated from Anthropic)
+  anthropicApiKey: process.env.GROQ_API_KEY || process.env.ANTHROPIC_API_KEY || '',
+  claudeModel:     process.env.CLAUDE_MODEL || 'llama-3.3-70b-versatile',
   claudeMaxTokens: optionalInt('CLAUDE_MAX_TOKENS', 1024),
   claudeTemp:      optionalFloat('CLAUDE_TEMPERATURE', 0.2),
 
-  // Rate limiting (against Claude API)
-  rateLimitRpm:     optionalInt('CLAUDE_RATE_LIMIT_RPM',     50),   // requests per minute
-  rateLimitTpm:     optionalInt('CLAUDE_RATE_LIMIT_TPM', 40_000),   // tokens per minute
+  // Rate limiting (against Groq API - free tier: 30 rpm, 6000 tpm for llama-3.3-70b)
+  rateLimitRpm:     optionalInt('CLAUDE_RATE_LIMIT_RPM',  25),   // requests per minute
+  rateLimitTpm:     optionalInt('CLAUDE_RATE_LIMIT_TPM', 5_000), // tokens per minute
 
   // Queue
   queueConcurrency:   optionalInt('QUEUE_CONCURRENCY',    3),

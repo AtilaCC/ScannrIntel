@@ -1,6 +1,6 @@
 // ============================================================
-// CLAUDE API CLIENT
-// Thin wrapper around the Anthropic Messages API.
+// GROQ API CLIENT (migrated from Anthropic Claude)
+// Thin wrapper around the Groq Chat Completions API.
 // Responsibilities:
 //   - Request/response serialization
 //   - HTTP error → typed ClaudeError classification
@@ -12,7 +12,6 @@
 import {
   ClaudeRequest,
   ClaudeResponse,
-  ClaudeErrorResponse,
   ClaudeErrorType,
   ClassifiedError,
   TokenUsage,
@@ -20,10 +19,9 @@ import {
 import { config, TOKEN_COST } from '../config';
 import { createLogger } from '../utils/shared';
 
-const logger = createLogger('claude-client');
+const logger = createLogger('groq-client');
 
-const ANTHROPIC_URL    = 'https://api.anthropic.com/v1/messages';
-const ANTHROPIC_VERSION = '2023-06-01';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const REQUEST_TIMEOUT_MS = 60_000;
 
 // ── Error classifier ─────────────────────────────────────────
@@ -90,16 +88,40 @@ export class ClaudeClient {
     let rawBody = '';
     let status  = 0;
 
+    // Convert Anthropic-style messages to OpenAI-style for Groq
+    const messages: any[] = [];
+    if (req.system) {
+      messages.push({ role: 'system', content: req.system });
+    }
+    for (const msg of req.messages) {
+      if (typeof msg.content === 'string') {
+        messages.push({ role: msg.role, content: msg.content });
+      } else {
+        // Extract text from content blocks
+        const text = msg.content
+          .filter((b: any) => b.type === 'text')
+          .map((b: any) => b.text)
+          .join('\n');
+        messages.push({ role: msg.role, content: text });
+      }
+    }
+
+    const groqBody = {
+      model: config.claudeModel,
+      max_tokens: req.max_tokens ?? 1024,
+      temperature: req.temperature ?? 0.2,
+      messages,
+    };
+
     try {
-      const res = await fetch(ANTHROPIC_URL, {
+      const res = await fetch(GROQ_URL, {
         method:  'POST',
         signal:  controller.signal,
         headers: {
-          'Content-Type':      'application/json',
-          'x-api-key':         this.apiKey,
-          'anthropic-version': ANTHROPIC_VERSION,
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
         },
-        body: JSON.stringify(req),
+        body: JSON.stringify(groqBody),
       });
 
       status  = res.status;
@@ -112,9 +134,24 @@ export class ClaudeClient {
         throw err;
       }
 
-      const data     = JSON.parse(rawBody) as ClaudeResponse;
+      const groqData = JSON.parse(rawBody);
       const latencyMs = Date.now() - startedAt;
-      const cost      = computeCost(data.usage);
+
+      // Normalize Groq response to ClaudeResponse shape
+      const data: ClaudeResponse = {
+        id: groqData.id,
+        type: 'message',
+        role: 'assistant',
+        model: groqData.model,
+        content: [{ type: 'text', text: groqData.choices?.[0]?.message?.content ?? '' }],
+        stop_reason: groqData.choices?.[0]?.finish_reason ?? 'end_turn',
+        usage: {
+          input_tokens:  groqData.usage?.prompt_tokens ?? 0,
+          output_tokens: groqData.usage?.completion_tokens ?? 0,
+        },
+      };
+
+      const cost = computeCost(data.usage);
 
       this.requestCount++;
       this.totalLatency += latencyMs;
@@ -127,12 +164,11 @@ export class ClaudeClient {
         estimatedCostUsd: cost,
       };
 
-      logger.info('Claude request completed', {
+      logger.info('Groq request completed', {
         model:      data.model,
         stopReason: data.stop_reason,
         inputTokens:  usage.inputTokens,
         outputTokens: usage.outputTokens,
-        costUsd:      cost.toFixed(6),
         latencyMs,
       });
 
