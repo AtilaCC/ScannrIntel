@@ -38,9 +38,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const { isConnected, subscribe } = useWebSocket((type, payload) => {
     switch (type) {
-      case 'market_data':
-        if (payload?.symbol) updateMarketData(payload);
+      case 'market_data': {
+        // payload shape from Redis: { type, payload: { symbol, ... }, timestamp }
+        const marketPayload = payload?.payload ?? payload;
+        if (marketPayload?.symbol) updateMarketData(marketPayload);
         break;
+      }
       case 'signals':
         if (payload) { addSignal(payload); toast.info(`📡 ${payload.type} on ${payload.symbol}`, { duration: 4000 }); }
         break;
