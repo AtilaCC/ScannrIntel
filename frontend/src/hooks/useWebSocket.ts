@@ -23,7 +23,11 @@ export function useWebSocket(onMessage: MessageHandler): UseWebSocketReturn {
   const [isConnected, setIsConnected] = useState(false);
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
+  const onMessageRef = useRef(onMessage);
   const MAX_RECONNECT = 10;
+
+  // Keep onMessage ref stable to avoid reconnect loops
+  useEffect(() => { onMessageRef.current = onMessage; });
 
   const connect = useCallback(() => {
     if (!isAuthenticated || !accessToken) return;
@@ -41,7 +45,7 @@ export function useWebSocket(onMessage: MessageHandler): UseWebSocketReturn {
       wsInstance.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data);
-          onMessage(msg.type, msg.payload);
+          onMessageRef.current(msg.type, msg.payload);
         } catch { /* ignore malformed */ }
       };
 
