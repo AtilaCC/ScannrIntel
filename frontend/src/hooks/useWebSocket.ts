@@ -22,6 +22,7 @@ export function useWebSocket(onMessage: MessageHandler): UseWebSocketReturn {
   const ws = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
+  const pingTimer = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
   const onMessageRef = useRef(onMessage);
   const MAX_RECONNECT = 10;
@@ -40,6 +41,13 @@ export function useWebSocket(onMessage: MessageHandler): UseWebSocketReturn {
         setIsConnected(true);
         reconnectAttempts.current = 0;
         console.log('[WS] Connected');
+        // Keepalive ping every 20 seconds to prevent Railway timeout
+        if (pingTimer.current) clearInterval(pingTimer.current);
+        pingTimer.current = setInterval(() => {
+          if (wsInstance.readyState === WebSocket.OPEN) {
+            wsInstance.send(JSON.stringify({ type: 'ping' }));
+          }
+        }, 20000) as any;
       };
 
       wsInstance.onmessage = (event) => {
@@ -51,6 +59,7 @@ export function useWebSocket(onMessage: MessageHandler): UseWebSocketReturn {
 
       wsInstance.onclose = (event) => {
         setIsConnected(false);
+        if (pingTimer.current) clearInterval(pingTimer.current);
         console.log('[WS] Disconnected', event.code);
 
         if (reconnectAttempts.current < MAX_RECONNECT) {
@@ -74,6 +83,7 @@ export function useWebSocket(onMessage: MessageHandler): UseWebSocketReturn {
     connect();
     return () => {
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
+      if (pingTimer.current) clearInterval(pingTimer.current);
       ws.current?.close(1000, 'Component unmounted');
     };
   }, [connect]);
