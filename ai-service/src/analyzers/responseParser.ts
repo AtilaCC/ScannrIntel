@@ -72,9 +72,14 @@ export function parseClaudeResponse(
     try {
       const obj = JSON.parse(jsonStr);
 
-      // Validate required fields exist
-      if (typeof obj.summary !== 'string' || typeof obj.details !== 'string') {
-        throw new Error('Missing required fields: summary or details');
+      // Accept both prompt formats:
+      // New format: analysis, keyDrivers (from systemPrompt)
+      // Old format: summary, details
+      const summary = (obj.summary || obj.analysis || '').trim().slice(0, 200);
+      const details = (obj.details || obj.analysis || '').trim();
+
+      if (!summary && !details) {
+        throw new Error('Missing required fields: summary/analysis');
       }
 
       // Parse per-factor scores if Claude provided them
@@ -92,13 +97,13 @@ export function parseClaudeResponse(
       }
 
       const insight: ParsedInsight = {
-        summary:          obj.summary.trim().slice(0, 200),
-        details:          obj.details.trim(),
+        summary,
+        details,
         riskScore:        clampInt(obj.riskScore,        0, 100, 50),
         opportunityScore: clampInt(obj.opportunityScore, 0, 100, 50),
         sentiment:        validSentiment(obj.sentiment),
-        tags:             validStringArray(obj.tags,            6),
-        recommendations:  validStringArray(obj.recommendations, 4),
+        tags:             validStringArray(obj.tags ?? obj.keyDrivers, 6),
+        recommendations:  validStringArray(obj.recommendations ?? obj.tradeInvalidationFactors, 4),
         confidence:       clampFloat(obj.confidence, 0, 1, 0.6),
         keyLevels: {
           support:    typeof obj.keyLevels?.support    === 'number' ? obj.keyLevels.support    : null,

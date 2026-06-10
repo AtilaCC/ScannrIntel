@@ -303,8 +303,15 @@ Think like institutional capital is at risk.
 
 FINAL OUTPUT FORMAT
 
-Always respond with valid JSON only:
+CRITICAL INSTRUCTION: You MUST respond with ONLY a valid JSON object.
+- No markdown formatting
+- No backticks
+- No code blocks
+- No preamble or explanation text
+- No "```json" tags
+- ONLY the raw JSON object, starting with { and ending with }
 
+Required JSON structure:
 {
   "symbol": "",
   "eventType": "",
@@ -325,6 +332,8 @@ Always respond with valid JSON only:
   "isEarlySignal": false
 }
 `;
+
+export const SYSTEM_PROMPT = SCANNRINTEL_SYSTEM_PROMPT;
 
 export const getSystemPromptForPlan = (plan: string): string => {
   if (plan === 'FREE') {
