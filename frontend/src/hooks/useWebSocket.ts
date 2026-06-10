@@ -1,13 +1,9 @@
-// ============================================================
-// USE WEBSOCKET HOOK — Real-time data from backend WS
-// ============================================================
-
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAuthStore } from '../store/authStore';
 
-const WS_URL = (process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:4000').replace(/\/ws$/, '');
+const WS_BASE = (process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:4000').replace(/\/ws$/, '');
 
 type MessageHandler = (type: string, payload: any) => void;
 
@@ -19,84 +15,115 @@ interface UseWebSocketReturn {
 
 export function useWebSocket(onMessage: MessageHandler): UseWebSocketReturn {
   const { accessToken, isAuthenticated } = useAuthStore();
-  const ws = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
-  const pingTimer = useRef<NodeJS.Timeout | null>(null);
-  const reconnectAttempts = useRef(0);
+  
+  // Use refs to avoid stale closures and prevent re-renders from causing reconnects
+  const wsRef = useRef<WebSocket | null>(null);
   const onMessageRef = useRef(onMessage);
-  const MAX_RECONNECT = 10;
+  const tokenRef = useRef(accessToken);
+  const pingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const attemptsRef = useRef(0);
+  const mountedRef = useRef(true);
 
-  // Keep onMessage ref stable to avoid reconnect loops
-  useEffect(() => { onMessageRef.current = onMessage; });
+  // Keep refs in sync without triggering reconnects
+  onMessageRef.current = onMessage;
+  tokenRef.current = accessToken;
+
+  const clearTimers = useCallback(() => {
+    if (pingRef.current) { clearInterval(pingRef.current); pingRef.current = null; }
+    if (reconnectRef.current) { clearTimeout(reconnectRef.current); reconnectRef.current = null; }
+  }, []);
 
   const connect = useCallback(() => {
-    if (!isAuthenticated || !accessToken) return;
-    if (ws.current?.readyState === WebSocket.OPEN) return;
+    if (!mountedRef.current) return;
+    if (!tokenRef.current || !isAuthenticated) return;
+    if (wsRef.current?.readyState === WebSocket.OPEN) return;
+    if (wsRef.current?.readyState === WebSocket.CONNECTING) return;
 
+    const url = `${WS_BASE}/ws?token=${tokenRef.current}`;
+    
     try {
-      const wsInstance = new WebSocket(`${WS_URL}/ws?token=${accessToken}`);
+      const ws = new WebSocket(url);
+      wsRef.current = ws;
 
-      wsInstance.onopen = () => {
+      ws.onopen = () => {
+        if (!mountedRef.current) { ws.close(); return; }
         setIsConnected(true);
-        reconnectAttempts.current = 0;
-        console.log('[WS] Connected');
-        // Keepalive ping every 20 seconds to prevent Railway timeout
-        if (pingTimer.current) clearInterval(pingTimer.current);
-        pingTimer.current = setInterval(() => {
-          if (wsInstance.readyState === WebSocket.OPEN) {
-            wsInstance.send(JSON.stringify({ type: 'ping' }));
+        attemptsRef.current = 0;
+        
+        // Keepalive ping every 20s
+        pingRef.current = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ping' }));
           }
-        }, 20000) as any;
+        }, 20000);
       };
 
-      wsInstance.onmessage = (event) => {
+      ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data);
-          onMessageRef.current(msg.type, msg.payload);
-        } catch { /* ignore malformed */ }
+          if (msg.type !== 'pong') {
+            onMessageRef.current(msg.type, msg.payload);
+          }
+        } catch {}
       };
 
-      wsInstance.onclose = (event) => {
+      ws.onclose = (event) => {
+        if (!mountedRef.current) return;
+        clearTimers();
         setIsConnected(false);
-        if (pingTimer.current) clearInterval(pingTimer.current);
-        console.log('[WS] Disconnected', event.code);
+        wsRef.current = null;
 
-        if (reconnectAttempts.current < MAX_RECONNECT) {
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30_000);
-          reconnectAttempts.current++;
-          reconnectTimer.current = setTimeout(connect, delay);
+        // Don't reconnect on auth errors
+        if (event.code === 4001) return;
+
+        // Exponential backoff reconnect
+        if (attemptsRef.current < 5) {
+          const delay = Math.min(2000 * Math.pow(2, attemptsRef.current), 30000);
+          attemptsRef.current++;
+          reconnectRef.current = setTimeout(connect, delay);
         }
       };
 
-      wsInstance.onerror = () => {
-        wsInstance.close();
+      ws.onerror = () => {
+        ws.close();
       };
 
-      ws.current = wsInstance;
-    } catch (err) {
-      console.error('[WS] Connection error', err);
-    }
-  }, [accessToken, isAuthenticated, onMessage]);
+    } catch {}
+  }, [isAuthenticated, clearTimers]);
 
+  // Only connect/disconnect when auth state changes
   useEffect(() => {
-    connect();
-    return () => {
-      if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
-      if (pingTimer.current) clearInterval(pingTimer.current);
-      ws.current?.close(1000, 'Component unmounted');
-    };
-  }, [connect]);
+    mountedRef.current = true;
+    
+    if (isAuthenticated && accessToken) {
+      // Small delay to ensure token is stable
+      const timer = setTimeout(connect, 500);
+      return () => {
+        clearTimeout(timer);
+        mountedRef.current = false;
+        clearTimers();
+        if (wsRef.current) {
+          wsRef.current.close(1000, 'unmounted');
+          wsRef.current = null;
+        }
+        setIsConnected(false);
+      };
+    }
+  // Only re-run when auth state changes, not on every render
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, !!accessToken]);
 
   const subscribe = useCallback((channel: string) => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ type: 'subscribe', channel }));
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'subscribe', channel }));
     }
   }, []);
 
   const unsubscribe = useCallback((channel: string) => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ type: 'unsubscribe', channel }));
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'unsubscribe', channel }));
     }
   }, []);
 
