@@ -28,7 +28,7 @@ export interface JWTPayload {
 
 export const JWT_CONFIG = {
   ALGORITHM: "HS256",
-  ACCESS_TOKEN_EXPIRY: '15m',
+  ACCESS_TOKEN_EXPIRY: '24h',
   REFRESH_TOKEN_EXPIRY: '7d',
 };
 
