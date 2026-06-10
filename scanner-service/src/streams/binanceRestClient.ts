@@ -10,7 +10,7 @@ import { createLogger } from '../utils/constants';
 
 const logger = createLogger('binance-rest');
 
-const BASE = 'https://api.binance.com/api/v3';
+const BASE = 'https://api.binance.us/api/v3';
 const TIMEOUT_MS = 10_000;
 
 async function fetchJSON<T>(path: string): Promise<T> {

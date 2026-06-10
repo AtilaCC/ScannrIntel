@@ -31,7 +31,7 @@ import { createLogger } from '../utils/constants';
 
 const logger = createLogger('stream-manager');
 
-const BINANCE_WS = 'wss://stream.binance.com:9443/stream';
+const BINANCE_WS = 'wss://stream.binance.us:9443/stream';
 
 // ── Per-connection state ──────────────────────────────────────
 
