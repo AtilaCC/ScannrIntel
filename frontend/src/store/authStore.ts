@@ -104,6 +104,16 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
+// Auto-initialize interceptors when store loads with existing token
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    const state = useAuthStore.getState();
+    if (state.accessToken && state.isAuthenticated) {
+      setupAxiosInterceptors(state.accessToken, state.refreshAccessToken);
+    }
+  }, 0);
+}
+
 // Axios interceptor for automatic token refresh
 let interceptorSetup = false;
 function setupAxiosInterceptors(token: string, refreshFn: () => Promise<boolean>) {
