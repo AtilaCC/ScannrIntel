@@ -154,6 +154,21 @@ export class ClaudeAnalyzer {
         // ── 8. Persist insight to DB ───────────────────────
         const insightId = generateId();
 
+        // Ensure Signal row exists (FK constraint on ai_insights_signal_id_fkey)
+        await this.prisma.signal.upsert({
+          where:  { id: signalId },
+          update: {},
+          create: {
+            id:       signalId,
+            symbol:   signal.symbol,
+            type:     signal.type,
+            severity: signal.severity as any,
+            data:     (signal.data ?? {}) as any,
+            metadata: (signal.metadata ?? {}) as any,
+          },
+        });
+
+
         const saved = await this.prisma.aIInsight.create({
           data: {
             id:               insightId,
