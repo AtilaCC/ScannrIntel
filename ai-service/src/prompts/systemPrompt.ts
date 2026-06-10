@@ -308,7 +308,7 @@ CRITICAL INSTRUCTION: You MUST respond with ONLY a valid JSON object.
 - No backticks
 - No code blocks
 - No preamble or explanation text
-- No "```json" tags
+- No \`\`\`json tags
 - ONLY the raw JSON object, starting with { and ending with }
 
 Required JSON structure:
