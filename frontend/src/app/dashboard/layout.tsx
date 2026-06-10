@@ -36,7 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!isAuthenticated) router.push('/auth/login');
   }, [isAuthenticated, router]);
 
-  const { isConnected } = useWebSocket((type, payload) => {
+  const { isConnected, subscribe } = useWebSocket((type, payload) => {
     switch (type) {
       case 'market_data':
         if (payload?.symbol) updateMarketData(payload);
@@ -56,6 +56,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         break;
     }
   });
+
+  // Subscribe to channels when connected
+  useEffect(() => {
+    if (isConnected) {
+      subscribe('market_data');
+      subscribe('signals');
+      subscribe('ai_insights');
+      subscribe('alerts');
+    }
+  }, [isConnected, subscribe]);
 
   const handleLogout = async () => {
     await logout();
