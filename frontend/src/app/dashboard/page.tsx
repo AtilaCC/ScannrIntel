@@ -89,7 +89,7 @@ export default function DashboardPage() {
         className="grid grid-cols-2 lg:grid-cols-4 gap-4"
       >
         {[
-          { label: 'Pairs Monitored', value: totalTickers || 20, icon: Activity, color: 'cyan', suffix: '' },
+          { label: 'Pares Monitorados', value: totalTickers || 20, icon: Activity, color: 'cyan', suffix: '' },
           { label: 'Altista 24h', value: bullish, icon: TrendingUp, color: 'green', suffix: '' },
           { label: 'Baixista 24h', value: bearish, icon: TrendingDown, color: 'red', suffix: '' },
           { label: 'Crítico Signals', value: criticalSignals, icon: Zap, color: 'yellow', suffix: '' },

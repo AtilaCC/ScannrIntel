@@ -116,8 +116,8 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <h2 className="font-display text-3xl font-bold text-text-primary">Sign in</h2>
-            <p className="text-text-secondary mt-2">Access your intelligence dashboard</p>
+            <h2 className="font-display text-3xl font-bold text-text-primary">Entrar</h2>
+            <p className="text-text-secondary mt-2">Acesse seu painel de inteligência</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -182,7 +182,7 @@ export default function LoginPage() {
 
           {/* Demo credentials */}
           <div className="border border-bg-border rounded-lg p-4 bg-bg-secondary/50">
-            <p className="text-text-muted text-xs mb-2 font-mono">DEMO CREDENTIALS</p>
+            <p className="text-text-muted text-xs mb-2 font-mono">CREDENCIAIS DEMO</p>
             <p className="text-text-secondary text-xs font-mono">demo@cryptointel.io / Demo1234!</p>
           </div>
         </div>

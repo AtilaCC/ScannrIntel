@@ -23,7 +23,7 @@ const FEATURE_MATRIX = [
     ],
   },
   {
-    category: 'AI Analysis',
+    category: 'Análise de IA',
     icon: Brain,
     rows: [
       { label: 'AI insights per day',        free: '5',           pro: '100',         ent: 'Unlimited'  },

@@ -141,13 +141,13 @@ export default function RegistrarPage() {
             disabled={isLoading}
             className="w-full py-3 rounded-lg bg-accent-cyan text-bg-primary font-display font-bold tracking-wide hover:bg-accent-cyan/90 disabled:opacity-50 transition-all shadow-glow-cyan"
           >
-            {isLoading ? 'Creating account...' : 'Create Account'}
+            {isLoading ? 'Creating account...' : 'Criar conta'}
           </button>
         </form>
 
         <p className="text-center text-text-secondary text-sm">
           Já tem uma conta?{' '}
-          <Link href="/auth/login" className="text-accent-cyan hover:underline">Sign in</Link>
+          <Link href="/auth/login" className="text-accent-cyan hover:underline">Entrar</Link>
         </p>
       </motion.div>
     </div>
