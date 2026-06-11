@@ -75,11 +75,8 @@ tradingEngineRouter.post('/manual', authenticate, requirePlan('PRO'), async (req
   }
 });
 
-// POST /api/v1/trading-engine/analyze (alias)
+// POST /api/v1/trading-engine/analyze (alias for /manual)
 tradingEngineRouter.post('/analyze', authenticate, requirePlan('PRO'), async (req: Request, res: Response) => {
-  return tradingEngineRouter.handle(
-    { ...req, url: '/manual' } as any,
-    res,
-    () => {}
-  );
+  req.url = '/manual';
+  return res.redirect(307, '/api/v1/trading-engine/manual');
 });

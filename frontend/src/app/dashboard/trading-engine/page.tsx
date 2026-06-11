@@ -268,7 +268,7 @@ function HistoryRow({ d, onClick }: { d: TradingDecision; onClick: () => void })
 // ── Main page ─────────────────────────────────────────────────
 
 export default function TradingEnginePage() {
-  const { user } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuthStore();
   const [text,       setText]       = useState('');
   const [signalType, setSignalType] = useState<SignalType>('NEWS_SIGNAL');
   const [loading,    setLoading]    = useState(false);
@@ -278,7 +278,7 @@ export default function TradingEnginePage() {
   const [activeTab,  setActiveTab]  = useState<'analyze' | 'history'>('analyze');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const isPro = user?.plan === 'PRO' || user?.plan === 'ENTERPRISE';
+  const isPro = user?.plan === 'PRO' || user?.plan === 'ENTERPRISE' || (user as any)?.subscription?.plan === 'PRO' || (user as any)?.subscription?.plan === 'ENTERPRISE';
 
   useEffect(() => { textareaRef.current?.focus(); }, []);
 
