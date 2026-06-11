@@ -32,7 +32,7 @@ interface TokenScoreRow {
 
 interface LeaderEntry { rank: number; symbol: string; score: number; sentiment: string; }
 
-type ViewMode  = 'grid' | 'leaderboard';
+type ViewMode  = 'grid' | 'ranking';
 type OrdenarField = 'risk' | 'opportunity' | 'symbol';
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -167,7 +167,7 @@ export default function ScoresPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-text-primary">Pontuações de Tokens</h1>
           <p className="text-text-secondary text-sm mt-1">
-            Risco calibrado por IA &amp; pontuações de oportunidade · Rule-based + Claude analysis
+            Risco calibrado por IA &amp; pontuações de oportunidade · Análise por regras + IA
           </p>
         </div>
         <button
@@ -183,10 +183,10 @@ export default function ScoresPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Avg Risco',       value: avgRisco,        icon: ShieldAlert, colour: scoreColour(avgRisco,       'risk') },
-          { label: 'Avg Oportunidade',value: avgOpp,         icon: TrendingUp,  colour: scoreColour(avgOpp,        'opp')  },
-          { label: 'High Risco (≥70)', value: highRiscoCount,  icon: Zap,         colour: 'text-accent-red'                  },
-          { label: 'Strong Opp (≥70)',value: strongOppCount, icon: Trophy,      colour: 'text-accent-green'                },
+          { label: 'Risco Médio',       value: avgRisco,        icon: ShieldAlert, colour: scoreColour(avgRisco,       'risk') },
+          { label: 'Oport. Média',value: avgOpp,         icon: TrendingUp,  colour: scoreColour(avgOpp,        'opp')  },
+          { label: 'Alto Risco (≥70)', value: highRiscoCount,  icon: Zap,         colour: 'text-accent-red'                  },
+          { label: 'Forte Oport. (≥70)',value: strongOppCount, icon: Trophy,      colour: 'text-accent-green'                },
         ].map(({ label, value, icon: Icon, colour }) => (
           <div key={label} className="glass-card rounded-xl p-4">
             <Icon className={`w-4 h-4 ${colour} mb-2`} />
@@ -199,7 +199,7 @@ export default function ScoresPage() {
       {/* View toggle + filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex gap-1 bg-bg-secondary border border-bg-border rounded-lg p-1">
-          {(['grid', 'leaderboard'] as ViewMode[]).map((v) => (
+          {(['grid', 'ranking'] as ViewMode[]).map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
@@ -248,7 +248,7 @@ export default function ScoresPage() {
                 <div className="flex items-center gap-2">
                   <Brain className="w-4 h-4 text-accent-purple" />
                   <h2 className="font-display font-bold text-text-primary text-sm">
-                    {sorted.length} Scored Tokens
+                    {sorted.length} Tokens Pontuados
                   </h2>
                 </div>
                 {/* Ordenar controls */}
@@ -277,7 +277,7 @@ export default function ScoresPage() {
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">PAR</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">PREÇO</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">RISK</th>
-                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">OPPORTUNITY</th>
+                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">OPORTUNIDADE</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">SENTIMENTO</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">ATUALIZADO</th>
                     </tr>
@@ -336,7 +336,7 @@ export default function ScoresPage() {
           )}
 
           {/* ── LEADERBOARD VIEW ──────────────────────────── */}
-          {view === 'leaderboard' && (
+          {view === 'ranking' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Risco leaderboard */}
               <div className="glass-card rounded-xl overflow-hidden">

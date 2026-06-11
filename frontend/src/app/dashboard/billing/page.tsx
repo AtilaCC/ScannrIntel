@@ -300,7 +300,7 @@ export default function BillingPage() {
             <FeatureRow label="AI insights/day"   value={sub.planDetails.features.aiInsightsPerDay} />
             <FeatureRow label="Signal history"    value={`${sub.planDetails.features.signalHistórico}d`} />
             <FeatureRow label="Token scores"      value={sub.planDetails.features.tokenScores} />
-            <FeatureRow label="Score leaderboard" value={sub.planDetails.features.scoreLeaderboard} />
+            <FeatureRow label="Ranking de pontuações" value={sub.planDetails.features.scoreLeaderboard} />
             <FeatureRow label="API access"        value={sub.planDetails.features.apiAccess} />
             <FeatureRow label="Data export"       value={sub.planDetails.features.dataExport} />
             <FeatureRow label="Support"           value={sub.planDetails.features.supportLevel} />

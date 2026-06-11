@@ -201,9 +201,9 @@ async function bootstrap() {
         const signals = processMarketSnapshot({
           symbol:     ticker.symbol,
           price:      ticker.price,
-          prevPrice:  ticker.prevPrice ?? ticker.price,
-          volume24h:  ticker.volume,
-          prevVolume: ticker.volume,
+          prevPrice:  ticker.openPrice ?? ticker.price,
+          volume24h:  ticker.quoteVolume24h,
+          prevVolume: ticker.quoteVolume24h,
         });
         for (const sig of signals) {
           await redisPublisher!.publishSignal({ ...sig, id: `auto-${sig.symbol}-${Date.now()}`, timestamp: Date.now() });
@@ -212,7 +212,7 @@ async function bootstrap() {
     } catch (err: any) {
       logger.error('Processor engine error', { error: err.message });
     }
-  }, 60_000); // every 60s
+  }, 30_000); // every 30s
 
   // ── 9. Health / metrics HTTP server ──────────────────────
   createHealthServer(

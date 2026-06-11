@@ -229,7 +229,7 @@ export function ScoreMeter({
           </div>
           <div className="mt-2 text-center">
             <div className="text-text-muted text-xs font-mono uppercase tracking-wider flex items-center gap-1 justify-center">
-              <TrendingUp className="w-3 h-3" /> OPPORTUNITY
+              <TrendingUp className="w-3 h-3" /> OPORTUNIDADE
             </div>
             <div className={`text-xs font-bold mt-0.5 ${oppColour(opportunityScore)}`}>
               {oppLabel(opportunityScore)}
@@ -311,7 +311,7 @@ export function ScoreMeter({
                   </div>
                 </div>
                 <div>
-                  <div className="text-text-muted text-xs font-mono mb-2">OPPORTUNITY AUDIT</div>
+                  <div className="text-text-muted text-xs font-mono mb-2">AUDITORIA DE OPORTUNIDADE</div>
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
                       <span className="text-text-muted">Rule composite</span>
