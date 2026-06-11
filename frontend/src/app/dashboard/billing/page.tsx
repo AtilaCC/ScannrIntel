@@ -133,21 +133,21 @@ export default function BillingPage() {
       setSub(subRes.data.data);
       setUsage(usageRes.data.data);
       setInvoices(invRes.data.data || []);
-    } catch { toast.error('Failed to load billing info'); }
+    } catch { toast.error('Falha ao carregar faturamento'); }
     finally   { setLoading(false); }
   };
 
-  const handleFazer Upgrade = async (plan: 'PRO' | 'ENTERPRISE') => {
+  const handleUpgrade = async (plan: 'PRO' | 'ENTERPRISE') => {
     try {
       const res = await api.post('/subscriptions/checkout', { plan, interval });
       const { checkoutUrl, mock } = res.data.data;
       if (mock) {
-        toast.info('Stripe not configured — simulating upgrade');
+        toast.info('Stripe não configurado — simulando upgrade');
         await fetchTodos();
       } else {
         window.location.href = checkoutUrl;
       }
-    } catch { toast.error('Failed to start checkout'); }
+    } catch { toast.error('Falha ao iniciar checkout'); }
   };
 
   const handleCancelar = async () => {
@@ -157,16 +157,16 @@ export default function BillingPage() {
       await api.post('/subscriptions/cancel');
       toast.success('Subscription will cancel at period end');
       await fetchTodos();
-    } catch { toast.error('Failed to cancel'); }
+    } catch { toast.error('Falha ao cancelar'); }
     finally { setCancelaring(false); }
   };
 
-  const handleReactivate = async () => {
+  const handleReativar = async () => {
     try {
       await api.post('/subscriptions/reactivate');
       toast.success('Subscription reactivated');
       await fetchTodos();
-    } catch { toast.error('Failed to reactivate'); }
+    } catch { toast.error('Falha ao reativar'); }
   };
 
   if (loading) {
@@ -209,10 +209,10 @@ export default function BillingPage() {
               {sub?.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toLocaleDateString() : '—'}.
             </p>
             <button
-              onClick={handleReactivate}
+              onClick={handleReativar}
               className="mt-2 text-xs text-yellow-300 underline hover:no-underline"
             >
-              Reactivate subscription
+              Reativar subscription
             </button>
           </div>
         </motion.div>
@@ -253,18 +253,18 @@ export default function BillingPage() {
             {isPaid && !isCancelared && (
               <button
                 onClick={handleCancelar}
-                disabled={canceling}
-                className="px-4 py-2 text-sm text-text-muted border border-bg-border rounded-lg hover:border-red-500/50 hover:text-red-400 transition-all disabled:opacity-50"
+                inativo={canceling}
+                className="px-4 py-2 text-sm text-text-muted border border-bg-border rounded-lg hover:border-red-500/50 hover:text-red-400 transition-all inativo:opacity-50"
               >
                 {canceling ? 'Cancelaring...' : 'Cancelar plan'}
               </button>
             )}
             {!isEnt && (
               <button
-                onClick={() => handleFazer Upgrade(isPro ? 'ENTERPRISE' : 'PRO')}
+                onClick={() => handleUpgrade(isPro ? 'ENTERPRISE' : 'PRO')}
                 className="px-4 py-2 text-sm bg-accent-cyan text-bg-primary rounded-lg font-display font-bold hover:bg-accent-cyan/90 transition-all shadow-glow-cyan"
               >
-                {isPro ? 'Fazer Upgrade to Enterprise' : 'Fazer Upgrade to Pro'}
+                {isPro ? 'Fazer Upgrade para Enterprise' : 'Fazer Upgrade para Pro'}
               </button>
             )}
           </div>
@@ -280,8 +280,8 @@ export default function BillingPage() {
               Current Usage
             </h3>
             <UsageBar label="Insights de IA (today)"  current={usage.aiInsights.today}  limit={usage.aiInsights.limit}   icon={Brain}   />
-            <UsageBar label="Active Alerts"         current={usage.alerts.current}     limit={usage.alerts.limit}       icon={Bell}    />
-            <UsageBar label="Watchlist Symbols"     current={usage.watchlist.current}  limit={usage.watchlist.limit}    icon={BarChart2} />
+            <UsageBar label="Ativo Alerts"         current={usage.alerts.current}     limit={usage.alerts.limit}       icon={Bell}    />
+            <UsageBar label="Watchlist Símbolos"     current={usage.watchlist.current}  limit={usage.watchlist.limit}    icon={BarChart2} />
             {isPaid && (
               <UsageBar label="API Calls (period)"  current={usage.apiCalls.period}    limit={-1}                       icon={Zap}     />
             )}
@@ -295,8 +295,8 @@ export default function BillingPage() {
               <Shield className="w-4 h-4 text-accent-purple" />
               Plan Features
             </h3>
-            <FeatureRow label="Watchlist symbols" value={sub.planDetails.features.maxWatchlistSymbols} />
-            <FeatureRow label="Active alerts"     value={sub.planDetails.features.maxAlerts} />
+            <FeatureRow label="Watchlist symbols" value={sub.planDetails.features.maxWatchlistSímbolos} />
+            <FeatureRow label="Ativo alerts"     value={sub.planDetails.features.maxAlerts} />
             <FeatureRow label="AI insights/day"   value={sub.planDetails.features.aiInsightsPerDay} />
             <FeatureRow label="Signal history"    value={`${sub.planDetails.features.signalHistórico}d`} />
             <FeatureRow label="Token scores"      value={sub.planDetails.features.tokenScores} />
@@ -353,19 +353,19 @@ export default function BillingPage() {
               </div>
               {tier === plan ? (
                 <div className="text-xs text-accent-cyan font-mono border border-accent-cyan/30 bg-accent-cyan/10 rounded px-2 py-1 text-center">
-                  Current Plan
+                  Plano Atual
                 </div>
               ) : (
                 <button
-                  onClick={() => tier !== 'FREE' && handleFazer Upgrade(tier as 'PRO' | 'ENTERPRISE')}
-                  disabled={tier === 'FREE'}
+                  onClick={() => tier !== 'FREE' && handleUpgrade(tier as 'PRO' | 'ENTERPRISE')}
+                  inativo={tier === 'FREE'}
                   className={`w-full text-xs py-1.5 rounded font-bold transition-all ${
                     tier === 'FREE'
                       ? 'text-text-muted cursor-not-allowed'
                       : 'bg-accent-cyan text-bg-primary hover:bg-accent-cyan/90'
                   }`}
                 >
-                  {tier === 'FREE' ? 'Downgrade' : `Fazer Upgrade to ${name}`}
+                  {tier === 'FREE' ? 'Rebaixar' : `Fazer Upgrade para ${name}`}
                 </button>
               )}
             </div>

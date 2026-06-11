@@ -30,9 +30,9 @@ export default function RegistrarPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (password !== confirm) { setError('Senhas do not match'); return; }
+    if (password !== confirm) { setError('As senhas não coincidem'); return; }
     if (!passwordRules.every((r) => r.test(password))) {
-      setError('Senha does not meet requirements');
+      setError('A senha não atende aos requisitos');
       return;
     }
     try {
@@ -61,7 +61,7 @@ export default function RegistrarPage() {
 
         <div>
           <h2 className="font-display text-3xl font-bold text-text-primary">Criar conta</h2>
-          <p className="text-text-secondary mt-2">Start monitoring markets with AI</p>
+          <p className="text-text-secondary mt-2">Começar monitoring markets with AI</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -138,8 +138,8 @@ export default function RegistrarPage() {
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full py-3 rounded-lg bg-accent-cyan text-bg-primary font-display font-bold tracking-wide hover:bg-accent-cyan/90 disabled:opacity-50 transition-all shadow-glow-cyan"
+            inativo={isLoading}
+            className="w-full py-3 rounded-lg bg-accent-cyan text-bg-primary font-display font-bold tracking-wide hover:bg-accent-cyan/90 inativo:opacity-50 transition-all shadow-glow-cyan"
           >
             {isLoading ? 'Creating account...' : 'Criar conta'}
           </button>

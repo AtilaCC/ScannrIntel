@@ -16,12 +16,12 @@ interface ScoreFactor {
 
 interface ScoreBreakdown {
   factors:             ScoreFactor[];
-  compositeRisk:       number;
-  compositeOpportunity:number;
-  claudeRisk:          number;
-  claudeOpportunity:   number;
-  finalRisk:           number;
-  finalOpportunity:    number;
+  compositeRisco:       number;
+  compositeOportunidade:number;
+  claudeRisco:          number;
+  claudeOportunidade:   number;
+  finalRisco:           number;
+  finalOportunidade:    number;
   ruleWeight:          number;
   claudeWeight:        number;
   computedAt:          number;
@@ -157,14 +157,14 @@ export function ScoreMeter({
   if (compact) {
     return (
       <div className="flex items-center gap-3">
-        {/* Risk pill */}
+        {/* Risco pill */}
         <div className="flex items-center gap-1">
           <ShieldAlert className={`w-3 h-3 ${riskColour(riskScore)}`} />
           <span className={`font-mono text-xs font-bold ${riskColour(riskScore)}`}>
             {riskScore}
           </span>
         </div>
-        {/* Opportunity pill */}
+        {/* Oportunidade pill */}
         <div className="flex items-center gap-1">
           <TrendingUp className={`w-3 h-3 ${oppColour(opportunityScore)}`} />
           <span className={`font-mono text-xs font-bold ${oppColour(opportunityScore)}`}>
@@ -197,7 +197,7 @@ export function ScoreMeter({
 
       {/* Dual gauge row */}
       <div className="grid grid-cols-2 divide-x divide-bg-border">
-        {/* Risk gauge */}
+        {/* Risco gauge */}
         <div className="flex flex-col items-center py-5 px-4">
           <div className="relative">
             <ArcGauge score={riskScore} colour={riskColour(riskScore)} bg={riskBg(riskScore)} />
@@ -217,7 +217,7 @@ export function ScoreMeter({
           </div>
         </div>
 
-        {/* Opportunity gauge */}
+        {/* Oportunidade gauge */}
         <div className="flex flex-col items-center py-5 px-4">
           <div className="relative">
             <ArcGauge score={opportunityScore} colour={oppColour(opportunityScore)} bg={oppBg(opportunityScore)} />
@@ -296,16 +296,16 @@ export function ScoreMeter({
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
                       <span className="text-text-muted">Rule composite</span>
-                      <span className="font-mono text-text-secondary">{breakdown.compositeRisk}</span>
+                      <span className="font-mono text-text-secondary">{breakdown.compositeRisco}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-text-muted">Claude score</span>
-                      <span className="font-mono text-text-secondary">{breakdown.claudeRisk}</span>
+                      <span className="font-mono text-text-secondary">{breakdown.claudeRisco}</span>
                     </div>
                     <div className="flex justify-between border-t border-bg-border/50 pt-1 mt-1">
                       <span className="text-text-secondary font-medium">Final</span>
-                      <span className={`font-mono font-bold ${riskColour(breakdown.finalRisk)}`}>
-                        {breakdown.finalRisk}
+                      <span className={`font-mono font-bold ${riskColour(breakdown.finalRisco)}`}>
+                        {breakdown.finalRisco}
                       </span>
                     </div>
                   </div>
@@ -315,16 +315,16 @@ export function ScoreMeter({
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
                       <span className="text-text-muted">Rule composite</span>
-                      <span className="font-mono text-text-secondary">{breakdown.compositeOpportunity}</span>
+                      <span className="font-mono text-text-secondary">{breakdown.compositeOportunidade}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-text-muted">Claude score</span>
-                      <span className="font-mono text-text-secondary">{breakdown.claudeOpportunity}</span>
+                      <span className="font-mono text-text-secondary">{breakdown.claudeOportunidade}</span>
                     </div>
                     <div className="flex justify-between border-t border-bg-border/50 pt-1 mt-1">
                       <span className="text-text-secondary font-medium">Final</span>
-                      <span className={`font-mono font-bold ${oppColour(breakdown.finalOpportunity)}`}>
-                        {breakdown.finalOpportunity}
+                      <span className={`font-mono font-bold ${oppColour(breakdown.finalOportunidade)}`}>
+                        {breakdown.finalOportunidade}
                       </span>
                     </div>
                   </div>

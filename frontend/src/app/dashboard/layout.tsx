@@ -171,7 +171,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-text-primary text-xs font-medium truncate">{user?.email}</div>
-                <PlanBadge plan={(user as any)?.plan ?? 'FREE'} showFazer Upgrade={true} />
+                <PlanBadge plan={(user as any)?.plan ?? 'FREE'} showUpgrade={true} />
               </div>
             </div>
             <button

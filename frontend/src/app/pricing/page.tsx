@@ -37,7 +37,7 @@ const FEATURE_MATRIX = [
     category: 'Alertas',
     icon: Bell,
     rows: [
-      { label: 'Active alert configs',       free: '3',           pro: '25',          ent: 'Unlimited'  },
+      { label: 'Ativo alert configs',       free: '3',           pro: '25',          ent: 'Unlimited'  },
       { label: 'In-app notifications',       free: true,          pro: true,          ent: true         },
       { label: 'E-mail notifications',        free: false,         pro: true,          ent: true         },
       { label: 'Telegram notifications',     free: false,         pro: true,          ent: true         },
@@ -141,7 +141,7 @@ function PricingCard({
 
       {current ? (
         <div className="text-center text-xs font-mono text-accent-cyan border border-accent-cyan/30 bg-accent-cyan/10 rounded-lg py-2.5">
-          Current Plan
+          Plano Atual
         </div>
       ) : (
         <button
@@ -154,7 +154,7 @@ function PricingCard({
               : 'bg-bg-tertiary text-text-primary border border-bg-border hover:border-accent-cyan hover:text-accent-cyan'
           }`}
         >
-          {price === 0 ? 'Get Started Grátis' : `Start ${name}`}
+          {price === 0 ? 'Começar Grátis' : `Começar ${name}`}
           <ArrowRight className="w-4 h-4" />
         </button>
       )}
@@ -248,7 +248,7 @@ export default function PricingPage() {
             Simple, transparent pricing
           </motion.h1>
           <p className="text-text-secondary text-xl max-w-xl mx-auto">
-            Start free. Fazer Upgrade when you need more AI insights, signals, and alerts.
+            Comece grátis. Faça upgrade quando precisar de mais insights de IA, sinais e alertas.
           </p>
 
           {/* Billing toggle */}
@@ -338,13 +338,13 @@ export default function PricingPage() {
               href="/auth/register"
               className="px-8 py-3 bg-accent-cyan text-bg-primary rounded-lg font-display font-bold hover:bg-accent-cyan/90 transition-all shadow-glow-cyan"
             >
-              Start for free
+              Começar for free
             </Link>
             <Link
               href="/auth/register?plan=PRO"
               className="px-8 py-3 bg-bg-secondary border border-bg-border text-text-secondary rounded-lg font-display font-bold hover:border-accent-cyan hover:text-accent-cyan transition-all"
             >
-              Start Pro trial
+              Começar Pro trial
             </Link>
           </div>
           <p className="text-text-muted text-sm">No credit card required for free plan.</p>

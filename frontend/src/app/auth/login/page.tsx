@@ -77,7 +77,7 @@ export default function LoginPage() {
           </p>
           <div className="space-y-4">
             {[
-              { icon: TrendingUp, label: 'Live Binance Scanner', desc: '20+ trading pairs monitored' },
+              { icon: TrendingUp, label: 'Scanner ao Vivo da Binance', desc: '20+ pares monitorados' },
               { icon: Zap, label: 'Claude AI Analysis', desc: 'Instant market insights' },
               { icon: Shield, label: 'Real-time Alerts', desc: 'Custom threshold notifications' },
             ].map(({ icon: Icon, label, desc }) => (
@@ -95,7 +95,7 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 text-text-muted text-xs">
-          © 2024 CryptoIntel. Not financial advice.
+          © 2024 CryptoIntel. Não é conselho financeiro.
         </div>
       </motion.div>
 
@@ -166,8 +166,8 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full py-3 rounded-lg bg-accent-cyan text-bg-primary font-display font-bold tracking-wide hover:bg-accent-cyan/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-glow-cyan"
+              inativo={isLoading}
+              className="w-full py-3 rounded-lg bg-accent-cyan text-bg-primary font-display font-bold tracking-wide hover:bg-accent-cyan/90 inativo:opacity-50 inativo:cursor-not-allowed transition-all duration-200 shadow-glow-cyan"
             >
               {isLoading ? 'Signing in...' : 'Entrar'}
             </button>

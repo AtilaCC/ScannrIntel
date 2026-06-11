@@ -7,7 +7,7 @@ import {
   Brain, Activity, Trophy, Zap,
 } from 'lucide-react';
 import { ScoreMeter } from '@/components/insights/ScoreMeter';
-import { Fazer UpgradePrompt } from '@/components/billing/PlanBadge';
+import { UpgradePrompt } from '@/components/billing/PlanBadge';
 import { api } from '@/lib/api';
 import { useMarketStore } from '@/store/marketStore';
 import { useAuthStore } from '@/store/authStore';
@@ -22,10 +22,10 @@ interface TokenScoreRow {
   sentiment:        'ALTISTA' | 'BAIXISTA' | 'NEUTRO';
   computedAt:       string;
   factors?:         any[];
-  compositeRisk?:   number;
-  compositeOpportunity?: number;
-  claudeRisk?:      number;
-  claudeOpportunity?: number;
+  compositeRisco?:   number;
+  compositeOportunidade?: number;
+  claudeRisco?:      number;
+  claudeOportunidade?: number;
   ruleWeight?:      number;
   claudeWeight?:    number;
 }
@@ -91,7 +91,7 @@ export default function ScoresPage() {
   const plan        = (user as any)?.plan ?? 'FREE';
 
   const [scores,      setScores]      = useState<TokenScoreRow[]>([]);
-  const [riskLeader,  setRiskLeader]  = useState<LeaderEntry[]>([]);
+  const [riskLeader,  setRiscoLeader]  = useState<LeaderEntry[]>([]);
   const [oppLeader,   setOppLeader]   = useState<LeaderEntry[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [view,        setView]        = useState<ViewMode>('grid');
@@ -115,10 +115,10 @@ export default function ScoresPage() {
         .map((d: any) => ({ symbol: d.symbol, ...d.score }));
 
       setScores(rows);
-      setRiskLeader(riskRes.data.data || []);
+      setRiscoLeader(riskRes.data.data || []);
       setOppLeader(oppRes.data.data  || []);
     } catch (err) {
-      toast.error('Failed to load score data');
+      toast.error('Falha ao carregar pontuações');
     } finally {
       setLoading(false);
     }
@@ -130,7 +130,7 @@ export default function ScoresPage() {
   if (plan === 'FREE') {
     return (
       <div className="p-6">
-        <Fazer UpgradePrompt
+        <UpgradePrompt
           feature="Pontuações de Tokens"
           requiredPlan="PRO"
           currentPlan="FREE"
@@ -155,9 +155,9 @@ export default function ScoresPage() {
     });
 
   // ── Summary stats ─────────────────────────────────────────
-  const avgRisk        = scores.length ? Math.round(scores.reduce((s, r) => s + r.riskScore,        0) / scores.length) : 0;
+  const avgRisco        = scores.length ? Math.round(scores.reduce((s, r) => s + r.riskScore,        0) / scores.length) : 0;
   const avgOpp         = scores.length ? Math.round(scores.reduce((s, r) => s + r.opportunityScore, 0) / scores.length) : 0;
-  const highRiskCount  = scores.filter((s) => s.riskScore >= 70).length;
+  const highRiscoCount  = scores.filter((s) => s.riskScore >= 70).length;
   const strongOppCount = scores.filter((s) => s.opportunityScore >= 70).length;
 
   return (
@@ -172,7 +172,7 @@ export default function ScoresPage() {
         </div>
         <button
           onClick={fetchData}
-          disabled={loading}
+          inativo={loading}
           className="flex items-center gap-2 px-3 py-2 bg-bg-secondary border border-bg-border rounded-lg text-text-secondary hover:border-accent-cyan hover:text-accent-cyan text-sm transition-all"
         >
           <AtualizarCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -183,9 +183,9 @@ export default function ScoresPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Avg Risk',       value: avgRisk,        icon: ShieldAlert, colour: scoreColour(avgRisk,       'risk') },
-          { label: 'Avg Opportunity',value: avgOpp,         icon: TrendingUp,  colour: scoreColour(avgOpp,        'opp')  },
-          { label: 'High Risk (≥70)', value: highRiskCount,  icon: Zap,         colour: 'text-accent-red'                  },
+          { label: 'Avg Risco',       value: avgRisco,        icon: ShieldAlert, colour: scoreColour(avgRisco,       'risk') },
+          { label: 'Avg Oportunidade',value: avgOpp,         icon: TrendingUp,  colour: scoreColour(avgOpp,        'opp')  },
+          { label: 'High Risco (≥70)', value: highRiscoCount,  icon: Zap,         colour: 'text-accent-red'                  },
           { label: 'Strong Opp (≥70)',value: strongOppCount, icon: Trophy,      colour: 'text-accent-green'                },
         ].map(({ label, value, icon: Icon, colour }) => (
           <div key={label} className="glass-card rounded-xl p-4">
@@ -338,7 +338,7 @@ export default function ScoresPage() {
           {/* ── LEADERBOARD VIEW ──────────────────────────── */}
           {view === 'leaderboard' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Risk leaderboard */}
+              {/* Risco leaderboard */}
               <div className="glass-card rounded-xl overflow-hidden">
                 <div className="flex items-center gap-2 px-5 py-4 border-b border-bg-border">
                   <ShieldAlert className="w-4 h-4 text-red-400" />
@@ -371,7 +371,7 @@ export default function ScoresPage() {
                 </div>
               </div>
 
-              {/* Opportunity leaderboard */}
+              {/* Oportunidade leaderboard */}
               <div className="glass-card rounded-xl overflow-hidden">
                 <div className="flex items-center gap-2 px-5 py-4 border-b border-bg-border">
                   <TrendingUp className="w-4 h-4 text-emerald-400" />
@@ -424,12 +424,12 @@ export default function ScoresPage() {
               sentiment={selected.sentiment}
               breakdown={selected.factors ? {
                 factors:              selected.factors,
-                compositeRisk:        selected.compositeRisk        ?? selected.riskScore,
-                compositeOpportunity: selected.compositeOpportunity ?? selected.opportunityScore,
-                claudeRisk:           selected.claudeRisk           ?? selected.riskScore,
-                claudeOpportunity:    selected.claudeOpportunity    ?? selected.opportunityScore,
-                finalRisk:            selected.riskScore,
-                finalOpportunity:     selected.opportunityScore,
+                compositeRisco:        selected.compositeRisco        ?? selected.riskScore,
+                compositeOportunidade: selected.compositeOportunidade ?? selected.opportunityScore,
+                claudeRisco:           selected.claudeRisco           ?? selected.riskScore,
+                claudeOportunidade:    selected.claudeOportunidade    ?? selected.opportunityScore,
+                finalRisco:            selected.riskScore,
+                finalOportunidade:     selected.opportunityScore,
                 ruleWeight:           selected.ruleWeight            ?? 0.55,
                 claudeWeight:         selected.claudeWeight          ?? 0.45,
                 computedAt:           new Date(selected.computedAt).getTime(),

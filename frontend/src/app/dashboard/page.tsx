@@ -35,7 +35,7 @@ export default function DashboardPage() {
         const unread = triggered.data.data?.filter((a: any) => !a.isRead).length || 0;
         setUnreadCount(unread);
       } catch (err) {
-        console.error('Failed to load dashboard data', err);
+        console.error('Falha ao carregar painel', err);
       }
     })();
   }, []);

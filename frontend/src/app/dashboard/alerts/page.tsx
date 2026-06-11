@@ -46,7 +46,7 @@ export default function AlertsPage() {
       ]);
       setConfigs(cfgRes.data.data || []);
       setTriggered(trgRes.data.data || []);
-    } catch { toast.error('Failed to load alerts'); }
+    } catch { toast.error('Falha ao carregar alertas'); }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -56,7 +56,7 @@ export default function AlertsPage() {
       toast.success('Alert created');
       setShowForm(false);
       fetchData();
-    } catch { toast.error('Failed to create alert'); }
+    } catch { toast.error('Falha ao criar alerta'); }
   };
 
   const handleExcluir = async (id: string) => {
@@ -64,14 +64,14 @@ export default function AlertsPage() {
       await alertApi.delete(id);
       setConfigs((prev) => prev.filter((c) => c.id !== id));
       toast.success('Alert deleted');
-    } catch { toast.error('Failed to delete alert'); }
+    } catch { toast.error('Falha ao excluir alerta'); }
   };
 
   const handleToggle = async (id: string) => {
     try {
       const res = await alertApi.toggle(id);
       setConfigs((prev) => prev.map((c) => c.id === id ? res.data.data : c));
-    } catch { toast.error('Failed to toggle alert'); }
+    } catch { toast.error('Falha ao alterar alerta'); }
   };
 
   const handleMarkRead = async (id: string) => {
@@ -113,7 +113,7 @@ export default function AlertsPage() {
             <h3 className="font-display font-bold text-text-primary mb-4">Criar Alerta</h3>
             <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-text-muted text-xs mb-1.5 font-mono uppercase">Symbol</label>
+                <label className="block text-text-muted text-xs mb-1.5 font-mono uppercase">Símbolo</label>
                 <select
                   value={form.symbol}
                   onChange={(e) => setForm({ ...form, symbol: e.target.value })}
@@ -123,7 +123,7 @@ export default function AlertsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-text-muted text-xs mb-1.5 font-mono uppercase">Condition</label>
+                <label className="block text-text-muted text-xs mb-1.5 font-mono uppercase">Condição</label>
                 <select
                   value={form.condition}
                   onChange={(e) => setForm({ ...form, condition: e.target.value })}
@@ -133,7 +133,7 @@ export default function AlertsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-text-muted text-xs mb-1.5 font-mono uppercase">Threshold</label>
+                <label className="block text-text-muted text-xs mb-1.5 font-mono uppercase">Limite</label>
                 <input
                   type="number"
                   required
@@ -210,11 +210,11 @@ export default function AlertsPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               className={`glass-card rounded-xl p-4 flex items-center justify-between gap-4 ${
-                cfg.isActive ? 'border-bg-border' : 'opacity-60'
+                cfg.isAtivo ? 'border-bg-border' : 'opacity-60'
               }`}
             >
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.isActive ? 'bg-accent-green animate-pulse' : 'bg-text-muted'}`} />
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.isAtivo ? 'bg-accent-green animate-pulse' : 'bg-text-muted'}`} />
                 <div className="min-w-0">
                   <div className="font-mono text-text-primary text-sm font-semibold">
                     {cfg.symbol}
@@ -236,7 +236,7 @@ export default function AlertsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => handleToggle(cfg.id)} className="text-text-muted hover:text-accent-cyan">
-                  {cfg.isActive ? <ToggleRight className="w-5 h-5 text-accent-cyan" /> : <ToggleLeft className="w-5 h-5" />}
+                  {cfg.isAtivo ? <ToggleRight className="w-5 h-5 text-accent-cyan" /> : <ToggleLeft className="w-5 h-5" />}
                 </button>
                 <button onClick={() => handleExcluir(cfg.id)} className="text-text-muted hover:text-accent-red">
                   <Trash2 className="w-4 h-4" />

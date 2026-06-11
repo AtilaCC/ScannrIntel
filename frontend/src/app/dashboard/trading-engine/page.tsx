@@ -40,7 +40,7 @@ const EXAMPLES = [
   {
     label: '🐋 Alerta de Baleia',
     type: 'MARKET_SIGNAL' as SignalType,
-    text: '🚨 BALEIA ALERT: 4,200 BTC ($287M) transferred from unknown wallet to Coinbase. Confirmed 3 minutes ago. BTC flat at $68,400, volume 1.2x average.',
+    text: '🚨 BALEIA ALERT: 4,200 BTC ($287M) transferred from unknown wallet to Coinbase. Confirmed 3 minutos ago. BTC flat at $68,400, volume 1.2x average.',
   },
   {
     label: '📰 Notícia do Fed',
@@ -50,10 +50,10 @@ const EXAMPLES = [
   {
     label: '🐦 Tweet do Elon',
     type: 'SOCIAL_SPIKE' as SignalType,
-    text: 'Elon Musk just tweeted "Doge 🚀🌕". Posted 2 minutes ago, 45k likes. DOGE at $0.142, volume up 3.4x in last 15 minutes.',
+    text: 'Elon Musk just tweeted "Doge 🚀🌕". Posted 2 minutos ago, 45k likes. DOGE at $0.142, volume up 3.4x in last 15 minutos.',
   },
   {
-    label: '📋 Nova Listagem',
+    label: '📋 Nova Listaagem',
     type: 'NEWS_SIGNAL' as SignalType,
     text: 'Coinbase Pro listing announcement: PEPE/USD going live in 48 hours. Currently on DEX only at $0.0000143. Volume ~$8M/day. No price move yet.',
   },
@@ -65,10 +65,10 @@ const EXAMPLES = [
 ];
 
 const SIGNAL_TYPES: { value: SignalType; label: string }[] = [
-  { value: 'NEWS_SIGNAL',    label: 'News'     },
+  { value: 'NEWS_SIGNAL',    label: 'Notícias'     },
   { value: 'MACRO_EVENT',    label: 'Macro'    },
   { value: 'SOCIAL_SPIKE',   label: 'Social'   },
-  { value: 'MARKET_SIGNAL',  label: 'Market'   },
+  { value: 'MARKET_SIGNAL',  label: 'Mercado'   },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -142,7 +142,7 @@ function RRBar({ ratio }: { ratio: number }) {
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between items-center">
-        <span className="text-[10px] uppercase tracking-widest text-text-muted">Risk / Reward</span>
+        <span className="text-[10px] uppercase tracking-widest text-text-muted">Risco / Reward</span>
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-text-muted">{quality}</span>
           <span className="font-mono font-bold text-sm" style={{ color: col }}>{ratio.toFixed(1)}x</span>
@@ -212,8 +212,8 @@ function DecisionCard({ d }: { d: TradingDecision }) {
 
       {/* Scores */}
       <div className="flex justify-around py-3 bg-black/20 rounded-lg border border-white/5">
-        <ScoreRing value={d.riskScore}        color={scoreColor(d.riskScore)}       label="Risk"        />
-        <ScoreRing value={d.opportunityScore} color={oppColor(d.opportunityScore)}   label="Opportunity" />
+        <ScoreRing value={d.riskScore}        color={scoreColor(d.riskScore)}       label="Risco"        />
+        <ScoreRing value={d.opportunityScore} color={oppColor(d.opportunityScore)}   label="Oportunidade" />
         <ScoreRing value={d.confidence}       color="#6688ff"                        label="Confidence"  />
       </div>
 
@@ -275,7 +275,7 @@ export default function TradingEnginePage() {
   const [result,     setResult]     = useState<TradingDecision | null>(null);
   const [error,      setError]      = useState('');
   const [history,    setHistórico]    = useState<TradingDecision[]>([]);
-  const [activeTab,  setActiveTab]  = useState<'analyze' | 'history'>('analyze');
+  const [activeTab,  setAtivoTab]  = useState<'analyze' | 'history'>('analyze');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const isPro = user?.plan === 'PRO' || user?.plan === 'ENTERPRISE' || (user as any)?.subscription?.plan === 'PRO' || (user as any)?.subscription?.plan === 'ENTERPRISE';
@@ -295,7 +295,7 @@ export default function TradingEnginePage() {
       setResult(data);
       setHistórico((h) => [data, ...h].slice(0, 20));
     } catch (err: any) {
-      const msg = err?.response?.data?.error ?? err?.message ?? 'Analysis failed';
+      const msg = err?.response?.data?.error ?? err?.message ?? 'Análise falhou';
       setError(msg);
     } finally {
       setLoading(false);
@@ -335,7 +335,7 @@ export default function TradingEnginePage() {
             <AlertTriangle className="w-5 h-5 text-accent-yellow flex-shrink-0" />
             <div>
               <p className="text-sm font-semibold text-text-primary">Recurso PRO</p>
-              <p className="text-xs text-text-muted">Fazer Upgrade your plan to access the Motor de Decisão de Trading.</p>
+              <p className="text-xs text-text-muted">Faça upgrade do seu plano to access the Motor de Decisão de Trading.</p>
             </div>
           </div>
         )}
@@ -345,7 +345,7 @@ export default function TradingEnginePage() {
           {(['analyze', 'history'] as const).map((t) => (
             <button
               key={t}
-              onClick={() => setActiveTab(t)}
+              onClick={() => setAtivoTab(t)}
               className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
                 activeTab === t
                   ? 'bg-bg-tertiary text-text-primary'
@@ -402,10 +402,10 @@ export default function TradingEnginePage() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') analyze(); }}
-                disabled={!isPro}
+                inativo={!isPro}
                 placeholder="Cole qualquer sinal de mercado here — news headline, tweet, whale alert, macro event, price action..."
                 rows={5}
-                className="w-full bg-bg-secondary border border-bg-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted resize-y focus:outline-none focus:border-accent-cyan/40 transition-colors disabled:opacity-40 font-mono"
+                className="w-full bg-bg-secondary border border-bg-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted resize-y focus:outline-none focus:border-accent-cyan/40 transition-colors inativo:opacity-40 font-mono"
               />
               <div className="absolute bottom-3 right-3 text-[10px] text-text-muted">
                 ⌘+Enter
@@ -415,11 +415,11 @@ export default function TradingEnginePage() {
             {/* Analisar button */}
             <button
               onClick={analyze}
-              disabled={!isPro || loading || !text.trim()}
+              inativo={!isPro || loading || !text.trim()}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all
                 bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan
                 hover:bg-accent-cyan/20 hover:border-accent-cyan/50
-                disabled:opacity-40 disabled:cursor-not-allowed"
+                inativo:opacity-40 inativo:cursor-not-allowed"
             >
               {loading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" />Executando motor de decisão...</>
@@ -449,7 +449,7 @@ export default function TradingEnginePage() {
             {history.length === 0 ? (
               <div className="text-center py-16 text-text-muted">
                 <Target className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                <p className="text-sm">No decisions yet. Analisar a signal first.</p>
+                <p className="text-sm">Nenhuma decisão ainda. Analise um sinal primeiro.</p>
               </div>
             ) : (
               <>
@@ -467,7 +467,7 @@ export default function TradingEnginePage() {
                   <HistóricoRow
                     key={d.id}
                     d={d}
-                    onClick={() => { setResult(d); setActiveTab('analyze'); }}
+                    onClick={() => { setResult(d); setAtivoTab('analyze'); }}
                   />
                 ))}
               </>

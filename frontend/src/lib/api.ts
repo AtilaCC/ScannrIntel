@@ -70,9 +70,9 @@ export const subscriptionApi = {
 
 export const scoresApi = {
   getTodos:              ()              => api.get('/scores'),
-  getBySymbol:         (s: string)    => api.get(`/scores/${s}`),
+  getBySímbolo:         (s: string)    => api.get(`/scores/${s}`),
   getHistórico:          (s: string, l = 50) => api.get(`/scores/${s}/history?limit=${l}`),
-  getLeaderboardRisk:  (l = 10)       => api.get(`/scores/leaderboard/risk?limit=${l}`),
+  getLeaderboardRisco:  (l = 10)       => api.get(`/scores/leaderboard/risk?limit=${l}`),
   getLeaderboardOpp:   (l = 10)       => api.get(`/scores/leaderboard/opportunity?limit=${l}`),
 };
 

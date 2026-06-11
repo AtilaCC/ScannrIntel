@@ -15,7 +15,7 @@ export default function InsightsPage() {
   const { insights: liveInsights } = useMarketStore();
   const [historicalInsights, setHistoricalInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterSymbol, setFiltrarSymbol] = useState('Todos');
+  const [filterSímbolo, setFiltrarSímbolo] = useState('Todos');
   const [filterSentiment, setFiltrarSentiment] = useState('Todos');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -25,15 +25,15 @@ export default function InsightsPage() {
     try {
       const res = await insightApi.getTodos({
         page: p,
-        symbol: filterSymbol === 'Todos' ? undefined : filterSymbol,
+        symbol: filterSímbolo === 'Todos' ? undefined : filterSímbolo,
       });
       setHistoricalInsights(p === 1 ? res.data.data : (prev: any) => [...prev, ...res.data.data]);
       setTotal(res.data.meta?.total || 0);
-    } catch { toast.error('Failed to load insights'); }
+    } catch { toast.error('Falha ao carregar insights'); }
     finally { setLoading(false); }
   };
 
-  useEffect(() => { setPage(1); fetchInsights(1); }, [filterSymbol]);
+  useEffect(() => { setPage(1); fetchInsights(1); }, [filterSímbolo]);
 
   const allInsights = [...liveInsights, ...historicalInsights]
     .filter((ins, i, arr) => arr.findIndex((x) => x.id === ins.id) === i)
@@ -51,7 +51,7 @@ export default function InsightsPage() {
         </div>
         <button
           onClick={() => fetchInsights(1)}
-          disabled={loading}
+          inativo={loading}
           className="flex items-center gap-2 px-3 py-2 bg-bg-secondary border border-bg-border rounded-lg text-text-secondary hover:border-accent-cyan hover:text-accent-cyan text-sm transition-all"
         >
           <AtualizarCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -62,14 +62,14 @@ export default function InsightsPage() {
       {/* Filtrars */}
       <div className="flex flex-wrap gap-3">
         <div>
-          <div className="text-text-muted text-xs font-mono mb-1.5 uppercase">Symbol</div>
+          <div className="text-text-muted text-xs font-mono mb-1.5 uppercase">Símbolo</div>
           <div className="flex flex-wrap gap-1.5">
             {SYMBOLS.map((s) => (
               <button
                 key={s}
-                onClick={() => setFiltrarSymbol(s)}
+                onClick={() => setFiltrarSímbolo(s)}
                 className={`px-3 py-1 rounded-full text-xs font-mono transition-all ${
-                  filterSymbol === s
+                  filterSímbolo === s
                     ? 'bg-accent-purple/20 text-accent-purple border border-accent-purple/30'
                     : 'bg-bg-secondary text-text-muted border border-bg-border hover:border-text-muted'
                 }`}
@@ -140,8 +140,8 @@ export default function InsightsPage() {
         <div className="text-center">
           <button
             onClick={() => { const next = page + 1; setPage(next); fetchInsights(next); }}
-            disabled={loading}
-            className="px-6 py-2 bg-bg-secondary border border-bg-border text-text-secondary rounded-lg text-sm hover:border-accent-cyan hover:text-accent-cyan transition-all disabled:opacity-50"
+            inativo={loading}
+            className="px-6 py-2 bg-bg-secondary border border-bg-border text-text-secondary rounded-lg text-sm hover:border-accent-cyan hover:text-accent-cyan transition-all inativo:opacity-50"
           >
             {loading ? 'Carregando...' : 'Load More'}
           </button>

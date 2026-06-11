@@ -71,14 +71,14 @@ function InsightCard({ insight }: { insight: any }) {
         <div className="mt-3 grid grid-cols-2 gap-3">
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-text-muted">Risk</span>
+              <span className="text-text-muted">Risco</span>
               <span className="font-mono text-accent-red">{insight.riskScore}</span>
             </div>
             <ScoreBar value={insight.riskScore} color="bg-accent-red" />
           </div>
           <div>
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-text-muted">Opportunity</span>
+              <span className="text-text-muted">Oportunidade</span>
               <span className="font-mono text-accent-green">{insight.opportunityScore}</span>
             </div>
             <ScoreBar value={insight.opportunityScore} color="bg-accent-green" />

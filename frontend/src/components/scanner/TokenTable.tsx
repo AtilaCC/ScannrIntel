@@ -31,9 +31,9 @@ export function TokenTable({ tokens, liveTickers }: TokenTableProps) {
   });
 
   // Also add any live tickers not in the static list
-  const knownSymbols = new Set(tokens.map((t) => t.symbol));
+  const knownSímbolos = new Set(tokens.map((t) => t.symbol));
   Object.values(liveTickers).forEach((ticker) => {
-    if (!knownSymbols.has(ticker.symbol)) merged.push(ticker);
+    if (!knownSímbolos.has(ticker.symbol)) merged.push(ticker);
   });
 
   const sorted = [...merged].sort((a, b) => {
@@ -52,7 +52,7 @@ export function TokenTable({ tokens, liveTickers }: TokenTableProps) {
         else { next.add(symbol); toast.success(`Adicionared ${symbol} to watchlist`); }
         return next;
       });
-    } catch { toast.error('Failed to update watchlist'); }
+    } catch { toast.error('Falha ao atualizar watchlist'); }
   };
 
   const setDir = setOrdenarDir;

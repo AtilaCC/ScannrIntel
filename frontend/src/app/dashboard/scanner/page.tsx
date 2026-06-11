@@ -92,7 +92,7 @@ export default function ScannerPage() {
             {/* Type filters */}
             <div className="flex flex-wrap gap-1">
               {['Todos', 'BALEIA', 'VOLUME', 'PREÇO'].map((t) => {
-                const full = t === 'Todos' ? 'Todos' : t === 'BALEIA' ? 'BALEIA_TRADE' : t === 'VOLUME' ? 'VOLUME_SPIKE' : 'PREÇO_SURGE';
+                const full = t === 'Todos' ? 'Todos' : t === 'BALEIA' ? 'BALEIA_TRADE' : t === 'VOLUME' ? 'VOLUME_SPIKE' : 'PRICE_SURGE';
                 return (
                   <button
                     key={t}
