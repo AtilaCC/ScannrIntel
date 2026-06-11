@@ -7,6 +7,7 @@ import {
   Loader2, Sparkles, History, Send,
 } from 'lucide-react';
 import { tradingEngineApi } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -244,9 +245,9 @@ function DecisionCard({ d }: { d: TradingDecision }) {
   );
 }
 
-// ── Histórico row ───────────────────────────────────────────────
+// ── History row ───────────────────────────────────────────────
 
-function HistóricoRow({ d, onClick }: { d: TradingDecision; onClick: () => void }) {
+function HistoryRow({ d, onClick }: { d: TradingDecision; onClick: () => void }) {
   const am = actionMeta(d.action);
   return (
     <button
