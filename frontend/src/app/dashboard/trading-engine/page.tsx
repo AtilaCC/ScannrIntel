@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Crosshair, Zap, TrendingUp, TrendingDown, Minus,
   Clock, Target, AlertTriangle, ChevronRight, RotateCcw,
-  Loader2, Sparkles, Histórico, Send,
+  Loader2, Sparkles, History, Send,
 } from 'lucide-react';
 import { tradingEngineApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
@@ -53,7 +53,7 @@ const EXAMPLES = [
     text: 'Elon Musk just tweeted "Doge 🚀🌕". Posted 2 minutos ago, 45k likes. DOGE at $0.142, volume up 3.4x in last 15 minutos.',
   },
   {
-    label: '📋 Nova Listaagem',
+    label: '📋 Nova Listagem',
     type: 'NEWS_SIGNAL' as SignalType,
     text: 'Coinbase Pro listing announcement: PEPE/USD going live in 48 hours. Currently on DEX only at $0.0000143. Volume ~$8M/day. No price move yet.',
   },
@@ -80,15 +80,15 @@ function actionMeta(action: string) {
 }
 
 function sentimentColor(s: string) {
-  if (s === 'ALTISTA') return 'text-accent-green';
-  if (s === 'BAIXISTA') return 'text-accent-red';
+  if (s === 'BULLISH' || s === 'ALTISTA') return 'text-accent-green';
+  if (s === 'BEARISH' || s === 'BAIXISTA') return 'text-accent-red';
   return 'text-accent-yellow';
 }
 
 function entryMeta(e: string) {
-  if (e === 'EARLY')        return { color: 'text-accent-green bg-accent-green/10',   label: '⚡ EARLY' };
-  if (e === 'CONFIRMATION') return { color: 'text-accent-yellow bg-accent-yellow/10', label: '✓ CONFIRMATION' };
-  return                           { color: 'text-accent-red bg-accent-red/10',        label: '⚠ LATE' };
+  if (e === 'EARLY')        return { color: 'text-accent-green bg-accent-green/10',   label: '⚡ ANTECIPADO' };
+  if (e === 'CONFIRMATION') return { color: 'text-accent-yellow bg-accent-yellow/10', label: '✓ CONFIRMAÇÃO' };
+  return                           { color: 'text-accent-red bg-accent-red/10',        label: '⚠ TARDIO' };
 }
 
 function scoreRing(value: number, max = 100) {
@@ -138,7 +138,7 @@ function ScoreRing({ value, color, label }: { value: number; color: string; labe
 function RRBar({ ratio }: { ratio: number }) {
   const pct = Math.min(100, (ratio / 5) * 100);
   const col = ratio >= 2.5 ? '#00ff88' : ratio >= 1.5 ? '#ffcc00' : '#ff4466';
-  const quality = ratio >= 2.5 ? 'High quality' : ratio >= 1.5 ? 'Acceptable' : 'Avoid';
+  const quality = ratio >= 2.5 ? 'Alta qualidade' : ratio >= 1.5 ? 'Aceitável' : 'Evitar';
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between items-center">
@@ -268,14 +268,14 @@ function HistóricoRow({ d, onClick }: { d: TradingDecision; onClick: () => void
 // ── Main page ─────────────────────────────────────────────────
 
 export default function TradingEnginePage() {
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: _authLoading } = useAuthStore();
   const [text,       setText]       = useState('');
   const [signalType, setSignalType] = useState<SignalType>('NEWS_SIGNAL');
   const [loading,    setLoading]    = useState(false);
   const [result,     setResult]     = useState<TradingDecision | null>(null);
   const [error,      setError]      = useState('');
-  const [history,    setHistórico]    = useState<TradingDecision[]>([]);
-  const [activeTab,  setAtivoTab]  = useState<'analyze' | 'history'>('analyze');
+  const [history,    setHistory]    = useState<TradingDecision[]>([]);
+  const [activeTab,  setActiveTab]  = useState<'analyze' | 'history'>('analyze');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const isPro = user?.plan === 'PRO' || user?.plan === 'ENTERPRISE' || (user as any)?.subscription?.plan === 'PRO' || (user as any)?.subscription?.plan === 'ENTERPRISE';
@@ -293,7 +293,7 @@ export default function TradingEnginePage() {
       const data = res.data.data as TradingDecision;
       data.id    = data.id ?? crypto.randomUUID();
       setResult(data);
-      setHistórico((h) => [data, ...h].slice(0, 20));
+      setHistory((h) => [data, ...h].slice(0, 20));
     } catch (err: any) {
       const msg = err?.response?.data?.error ?? err?.message ?? 'Análise falhou';
       setError(msg);
@@ -335,7 +335,7 @@ export default function TradingEnginePage() {
             <AlertTriangle className="w-5 h-5 text-accent-yellow flex-shrink-0" />
             <div>
               <p className="text-sm font-semibold text-text-primary">Recurso PRO</p>
-              <p className="text-xs text-text-muted">Faça upgrade do seu plano to access the Motor de Decisão de Trading.</p>
+              <p className="text-xs text-text-muted">Faça upgrade do seu plano para acessar o Motor de Decisão.</p>
             </div>
           </div>
         )}
@@ -345,14 +345,14 @@ export default function TradingEnginePage() {
           {(['analyze', 'history'] as const).map((t) => (
             <button
               key={t}
-              onClick={() => setAtivoTab(t)}
+              onClick={() => setActiveTab(t)}
               className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
                 activeTab === t
                   ? 'bg-bg-tertiary text-text-primary'
                   : 'text-text-muted hover:text-text-secondary'
               }`}
             >
-              {t === 'analyze' ? <Sparkles className="w-3.5 h-3.5" /> : <Histórico className="w-3.5 h-3.5" />}
+              {t === 'analyze' ? <Sparkles className="w-3.5 h-3.5" /> : <History className="w-3.5 h-3.5" />}
               {t === 'analyze' ? 'Analisar' : `Histórico ${history.length > 0 ? `(${history.length})` : ''}`}
             </button>
           ))}
@@ -403,7 +403,7 @@ export default function TradingEnginePage() {
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') analyze(); }}
                 disabled={!isPro}
-                placeholder="Cole qualquer sinal de mercado here — news headline, tweet, whale alert, macro event, price action..."
+                placeholder="Cole qualquer sinal de mercado aqui — manchete, tweet, alerta de baleia, evento macro, ação de preço..."
                 rows={5}
                 className="w-full bg-bg-secondary border border-bg-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted resize-y focus:outline-none focus:border-accent-cyan/40 transition-colors disabled:opacity-40 font-mono"
               />
@@ -424,7 +424,7 @@ export default function TradingEnginePage() {
               {loading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" />Executando motor de decisão...</>
               ) : (
-                <><Send className="w-4 h-4" />Analisar Signal</>
+                <><Send className="w-4 h-4" />Analisar Sinal</>
               )}
             </button>
 
@@ -456,7 +456,7 @@ export default function TradingEnginePage() {
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-xs text-text-muted">{history.length} decision{history.length !== 1 ? 's' : ''} this session</span>
                   <button
-                    onClick={() => setHistórico([])}
+                    onClick={() => setHistory([])}
                     className="flex items-center gap-1 text-xs text-text-muted hover:text-accent-red transition-colors"
                   >
                     <RotateCcw className="w-3 h-3" />
@@ -467,7 +467,7 @@ export default function TradingEnginePage() {
                   <HistóricoRow
                     key={d.id}
                     d={d}
-                    onClick={() => { setResult(d); setAtivoTab('analyze'); }}
+                    onClick={() => { setResult(d); setActiveTab('analyze'); }}
                   />
                 ))}
               </>
