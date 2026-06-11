@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Zap, LayoutDashboard, TrendingUp, Brain, Bell,
-  Settings, LogOut, Wifi, WifiOff, Menu, X, ChevronRight, BarChart2, CreditCard, Crosshair,
+  Settings, LogOut, Wifi, WifiOff, Menu, X, ChevronRight, BarChart2, CreditCard, Crosshair, Newspaper,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { PlanBadge } from '@/components/billing/PlanBadge';
@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/insights',       icon: Brain,           label: 'Insights de IA'     },
   { href: '/dashboard/trading-engine', icon: Crosshair,       label: 'Motor de Decisão' },
   { href: '/dashboard/alerts',         icon: Bell,            label: 'Alertas'          },
+  { href: '/dashboard/news',           icon: Newspaper,       label: 'Notícias'         },
   { href: '/dashboard/billing',        icon: CreditCard,      label: 'Faturamento'         },
 ];
 

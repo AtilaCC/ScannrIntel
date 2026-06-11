@@ -27,6 +27,9 @@ import {
   NormalizedBookTicker,
 } from './types';
 import { createLogger } from './utils/constants';
+import { processMarketSnapshot } from './processors/signalProcessor';
+import { fetchWhaleTransactions } from './processors/whaleAlert';
+import { fetchCryptoNews } from './processors/newsProcessor';
 
 const logger = createLogger('scanner-service');
 
@@ -160,7 +163,58 @@ async function bootstrap() {
     30_000, // every 30s
   );
 
-  // ── 8. Health / metrics HTTP server ──────────────────────
+  // ── 8. Processor Engine — news, whale alerts, auto-signals ─
+  const processorInterval = setInterval(async () => {
+    try {
+      // News & Macro
+      const news = await fetchCryptoNews('hot');
+      const highImpact = news.filter(n => n.impact === 'HIGH' || n.impact === 'CRITICAL');
+      for (const item of highImpact.slice(0, 3)) {
+        await redisPublisher!.publishSignal({
+          id:        `news-${item.id}`,
+          symbol:    item.currencies[0] ? `${item.currencies[0]}USDT` : 'MARKET',
+          type:      'NEWS_SIGNAL',
+          severity:  item.impact,
+          data:      { title: item.title, url: item.url, source: item.source, sentiment: item.sentiment },
+          metadata:  { publishedAt: item.publishedAt, votes: item.votes },
+          timestamp: Date.now(),
+        });
+      }
+
+      // Whale Alert
+      const whales = await fetchWhaleTransactions();
+      for (const tx of whales) {
+        await redisPublisher!.publishSignal({
+          id:       `whale-${tx.id}`,
+          symbol:   `${tx.symbol}USDT`,
+          type:     'WHALE_TRADE',
+          severity: tx.amountUsd >= 1_000_000 ? 'CRITICAL' : 'HIGH',
+          data:     { amountUsd: tx.amountUsd, from: tx.from, to: tx.to, blockchain: tx.blockchain, hash: tx.hash },
+          metadata: { timestamp: tx.timestamp },
+          timestamp: Date.now(),
+        });
+      }
+
+      // Auto-signal from ticker snapshots
+      const tickers = cache.getAllTickers();
+      for (const ticker of tickers) {
+        const signals = processMarketSnapshot({
+          symbol:     ticker.symbol,
+          price:      ticker.price,
+          prevPrice:  ticker.prevPrice ?? ticker.price,
+          volume24h:  ticker.volume,
+          prevVolume: ticker.volume,
+        });
+        for (const sig of signals) {
+          await redisPublisher!.publishSignal({ ...sig, id: `auto-${sig.symbol}-${Date.now()}`, timestamp: Date.now() });
+        }
+      }
+    } catch (err: any) {
+      logger.error('Processor engine error', { error: err.message });
+    }
+  }, 60_000); // every 60s
+
+  // ── 9. Health / metrics HTTP server ──────────────────────
   createHealthServer(
     env.PORT,
     streamManager,
@@ -179,6 +233,7 @@ async function bootstrap() {
   const shutdown = async (signal: string) => {
     logger.info(`${signal} received — shutting down scanner...`);
     clearInterval(snapshotInterval);
+    clearInterval(processorInterval);
 
     if (streamManager) {
       await streamManager.stop();

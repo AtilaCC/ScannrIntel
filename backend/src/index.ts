@@ -25,6 +25,7 @@ import { scoresRouter }  from './routes/scores';
 import { createSubscriptionRouter } from './routes/subscriptions';
 import { initSubscriptionMiddleware } from './middleware/subscription';
 import { tradingEngineRouter } from './routes/tradingEngine';
+import { newsRouter } from './routes/news';
 
 import { WSManager } from './services/wsManager';
 import { REDIS_CHANNELS } from './utils/shared';
@@ -67,6 +68,7 @@ async function bootstrap() {
   app.use('/api/v1/scores',        scoresRouter);
   app.use('/api/v1/subscriptions',    createSubscriptionRouter(prisma, redis));
   app.use('/api/v1/trading-engine',   tradingEngineRouter);
+  app.use('/api/v1/news',             newsRouter);
 
   // Init subscription middleware (makes plan resolver available globally)
   initSubscriptionMiddleware(prisma, redis);
