@@ -10,7 +10,8 @@
     "prisma:migrate": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "set-enterprise": "npx ts-node --transpile-only scripts/setEnterprise.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0",
