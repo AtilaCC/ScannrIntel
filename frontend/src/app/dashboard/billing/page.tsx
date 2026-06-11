@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   CreditCard, Zap, Shield, BarChart2, Bell, Brain,
-  CheckCircle, XCircle, AtualizarCw, ExternalLink, AlertTriangle,
+  CheckCircle, XCircle, RefreshCw, ExternalLink, AlertTriangle,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
@@ -172,7 +172,7 @@ export default function BillingPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24 text-text-muted">
-        <AtualizarCw className="w-6 h-6 animate-spin mr-3" />
+        <RefreshCw className="w-6 h-6 animate-spin mr-3" />
         Loading billing info...
       </div>
     );
@@ -253,8 +253,8 @@ export default function BillingPage() {
             {isPaid && !isCancelared && (
               <button
                 onClick={handleCancelar}
-                inativo={canceling}
-                className="px-4 py-2 text-sm text-text-muted border border-bg-border rounded-lg hover:border-red-500/50 hover:text-red-400 transition-all inativo:opacity-50"
+                disabled={canceling}
+                className="px-4 py-2 text-sm text-text-muted border border-bg-border rounded-lg hover:border-red-500/50 hover:text-red-400 transition-all disabled:opacity-50"
               >
                 {canceling ? 'Cancelaring...' : 'Cancelar plan'}
               </button>
@@ -358,7 +358,7 @@ export default function BillingPage() {
               ) : (
                 <button
                   onClick={() => tier !== 'FREE' && handleUpgrade(tier as 'PRO' | 'ENTERPRISE')}
-                  inativo={tier === 'FREE'}
+                  disabled={tier === 'FREE'}
                   className={`w-full text-xs py-1.5 rounded font-bold transition-all ${
                     tier === 'FREE'
                       ? 'text-text-muted cursor-not-allowed'

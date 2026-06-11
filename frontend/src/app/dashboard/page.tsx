@@ -25,8 +25,8 @@ export default function DashboardPage() {
       try {
         const [ins, sigs, toks, triggered] = await Promise.all([
           insightApi.getLatest(),
-          signalApi.getTodos({ limit: 20 }),
-          tokenApi.getTodos(),
+          signalApi.getAll({ limit: 20 }),
+          tokenApi.getAll(),
           alertApi.getTriggered(),
         ]);
         setLatestInsights(ins.data.data || []);

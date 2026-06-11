@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, TrendingUp, BarChart2, AtualizarCw } from 'lucide-react';
+import { Activity, TrendingUp, BarChart2, RefreshCw } from 'lucide-react';
 import { useMarketStore } from '@/store/marketStore';
 import { tokenApi, signalApi } from '@/lib/api';
 import { TokenTable } from '@/components/scanner/TokenTable';
@@ -12,15 +12,15 @@ export default function ScannerPage() {
   const { tickers, signals } = useMarketStore();
   const [tokens, setTokens] = useState<any[]>([]);
   const [historicalSignals, setHistoricalSignals] = useState<any[]>([]);
-  const [filterType, setFiltrarType] = useState('Todos');
-  const [filterSeverity, setFiltrarSeverity] = useState('Todos');
+  const [filterType, setFilterType] = useState('Todos');
+  const [filterSeverity, setFilterSeverity] = useState('Todos');
 
   useEffect(() => {
     (async () => {
       try {
         const [toks, sigs] = await Promise.all([
-          tokenApi.getTodos(),
-          signalApi.getTodos({ limit: 50 }),
+          tokenApi.getAll(),
+          signalApi.getAll({ limit: 50 }),
         ]);
         setTokens(toks.data.data || []);
         setHistoricalSignals(sigs.data.data || []);
@@ -96,7 +96,7 @@ export default function ScannerPage() {
                 return (
                   <button
                     key={t}
-                    onClick={() => setFiltrarType(full)}
+                    onClick={() => setFilterType(full)}
                     className={`px-2 py-0.5 rounded text-xs font-mono transition-all ${
                       filterType === full || (t === 'PREÇO' && (filterType === 'PREÇO_SURGE' || filterType === 'PREÇO_CRASH'))
                         ? 'bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30'

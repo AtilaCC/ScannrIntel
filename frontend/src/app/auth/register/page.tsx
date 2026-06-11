@@ -17,10 +17,10 @@ const passwordRules = [
 export default function RegistrarPage() {
   const router = useRouter();
   const { register, isAuthenticated, isLoading } = useAuthStore();
-  const [email, setE-mail] = useState('');
-  const [password, setSenha] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [showSenha, setShowSenha] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function RegistrarPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setE-mail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="you@example.com"
               className="w-full bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan transition-colors font-mono text-sm"
@@ -81,19 +81,19 @@ export default function RegistrarPage() {
             <label className="block text-text-secondary text-sm mb-2">Senha</label>
             <div className="relative">
               <input
-                type={showSenha ? 'text' : 'password'}
+                type={showPass ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => setSenha(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
                 className="w-full bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 pr-12 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan transition-colors font-mono text-sm"
               />
               <button
                 type="button"
-                onClick={() => setShowSenha(!showSenha)}
+                onClick={() => setShowPass(!showPass)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
               >
-                {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {/* Senha rules */}
@@ -138,8 +138,8 @@ export default function RegistrarPage() {
 
           <button
             type="submit"
-            inativo={isLoading}
-            className="w-full py-3 rounded-lg bg-accent-cyan text-bg-primary font-display font-bold tracking-wide hover:bg-accent-cyan/90 inativo:opacity-50 transition-all shadow-glow-cyan"
+            disabled={isLoading}
+            className="w-full py-3 rounded-lg bg-accent-cyan text-bg-primary font-display font-bold tracking-wide hover:bg-accent-cyan/90 disabled:opacity-50 transition-all shadow-glow-cyan"
           >
             {isLoading ? 'Creating account...' : 'Criar conta'}
           </button>

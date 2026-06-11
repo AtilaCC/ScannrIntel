@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ShieldAlert, TrendingUp, AtualizarCw, ArrowUpDown,
+  ShieldAlert, TrendingUp, RefreshCw, ArrowUpDown,
   Brain, Activity, Trophy, Zap,
 } from 'lucide-react';
 import { ScoreMeter } from '@/components/insights/ScoreMeter';
@@ -98,7 +98,7 @@ export default function ScoresPage() {
   const [sortField,   setOrdenarField]   = useState<OrdenarField>('risk');
   const [sortDir,     setOrdenarDir]     = useState<'asc' | 'desc'>('desc');
   const [selected,    setSelected]    = useState<TokenScoreRow | null>(null);
-  const [filterSentiment, setFiltrarSentiment] = useState<string>('Todos');
+  const [filterSentiment, setFilterSentiment] = useState<string>('Todos');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -172,10 +172,10 @@ export default function ScoresPage() {
         </div>
         <button
           onClick={fetchData}
-          inativo={loading}
+          disabled={loading}
           className="flex items-center gap-2 px-3 py-2 bg-bg-secondary border border-bg-border rounded-lg text-text-secondary hover:border-accent-cyan hover:text-accent-cyan text-sm transition-all"
         >
-          <AtualizarCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Atualizar
         </button>
       </div>
@@ -219,7 +219,7 @@ export default function ScoresPage() {
           {['Todos', 'ALTISTA', 'NEUTRO', 'BAIXISTA'].map((s) => (
             <button
               key={s}
-              onClick={() => setFiltrarSentiment(s)}
+              onClick={() => setFilterSentiment(s)}
               className={`px-3 py-1 rounded-full text-xs font-mono transition-all ${
                 filterSentiment === s
                   ? s === 'ALTISTA' ? 'bg-green-500/20 text-green-400 border border-green-500/30'
@@ -236,7 +236,7 @@ export default function ScoresPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-text-muted">
-          <AtualizarCw className="w-6 h-6 animate-spin mr-3" />
+          <RefreshCw className="w-6 h-6 animate-spin mr-3" />
           Loading scores...
         </div>
       ) : (

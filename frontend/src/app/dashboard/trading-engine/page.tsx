@@ -402,10 +402,10 @@ export default function TradingEnginePage() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') analyze(); }}
-                inativo={!isPro}
+                disabled={!isPro}
                 placeholder="Cole qualquer sinal de mercado here — news headline, tweet, whale alert, macro event, price action..."
                 rows={5}
-                className="w-full bg-bg-secondary border border-bg-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted resize-y focus:outline-none focus:border-accent-cyan/40 transition-colors inativo:opacity-40 font-mono"
+                className="w-full bg-bg-secondary border border-bg-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted resize-y focus:outline-none focus:border-accent-cyan/40 transition-colors disabled:opacity-40 font-mono"
               />
               <div className="absolute bottom-3 right-3 text-[10px] text-text-muted">
                 ⌘+Enter
@@ -415,11 +415,11 @@ export default function TradingEnginePage() {
             {/* Analisar button */}
             <button
               onClick={analyze}
-              inativo={!isPro || loading || !text.trim()}
+              disabled={!isPro || loading || !text.trim()}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all
                 bg-accent-cyan/10 border border-accent-cyan/30 text-accent-cyan
                 hover:bg-accent-cyan/20 hover:border-accent-cyan/50
-                inativo:opacity-40 inativo:cursor-not-allowed"
+                disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" />Executando motor de decisão...</>

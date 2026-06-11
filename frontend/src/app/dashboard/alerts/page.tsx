@@ -41,7 +41,7 @@ export default function AlertsPage() {
   const fetchData = async () => {
     try {
       const [cfgRes, trgRes] = await Promise.all([
-        alertApi.getTodos(),
+        alertApi.getAll(),
         alertApi.getTriggered(),
       ]);
       setConfigs(cfgRes.data.data || []);

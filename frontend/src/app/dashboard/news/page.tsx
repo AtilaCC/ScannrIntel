@@ -85,7 +85,7 @@ export default function NewsPage() {
           </h1>
           <p className="text-gray-400 text-sm mt-1">Feed em tempo real de notícias do mercado cripto</p>
         </div>
-        <button onClick={load} inativo={loading} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white text-sm transition-all">
+        <button onClick={load} disabled={loading} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white text-sm transition-all">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Atualizar
         </button>
