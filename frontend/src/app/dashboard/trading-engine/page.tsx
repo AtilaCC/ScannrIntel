@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Crosshair, Zap, TrendingUp, TrendingDown, Minus,
   Clock, Target, AlertTriangle, ChevronRight, RotateCcw,
-  Loader2, Sparkles, History, Send,
+  Loader2, Sparkles, Histórico, Send,
 } from 'lucide-react';
 import { tradingEngineApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
@@ -18,7 +18,7 @@ interface TradingDecision {
   id: string;
   symbol: string;
   eventType: SignalType;
-  sentiment: 'BULLISH' | 'BEARISH' | 'NEUTRAL';
+  sentiment: 'ALTISTA' | 'BAIXISTA' | 'NEUTRO';
   action: 'BUY' | 'SELL' | 'HOLD';
   entryType: 'EARLY' | 'CONFIRMATION' | 'LATE';
   summary: string;
@@ -38,27 +38,27 @@ interface TradingDecision {
 
 const EXAMPLES = [
   {
-    label: '🐋 Whale Alert',
+    label: '🐋 Alerta de Baleia',
     type: 'MARKET_SIGNAL' as SignalType,
-    text: '🚨 WHALE ALERT: 4,200 BTC ($287M) transferred from unknown wallet to Coinbase. Confirmed 3 minutes ago. BTC flat at $68,400, volume 1.2x average.',
+    text: '🚨 BALEIA ALERT: 4,200 BTC ($287M) transferred from unknown wallet to Coinbase. Confirmed 3 minutes ago. BTC flat at $68,400, volume 1.2x average.',
   },
   {
-    label: '📰 Fed News',
+    label: '📰 Notícia do Fed',
     type: 'MACRO_EVENT' as SignalType,
     text: 'BREAKING: Federal Reserve signals surprise rate cut citing crypto-friendly banking reform bill passing Senate 67-33. Market reaction minimal so far — futures down 0.2%.',
   },
   {
-    label: '🐦 Elon Tweet',
+    label: '🐦 Tweet do Elon',
     type: 'SOCIAL_SPIKE' as SignalType,
     text: 'Elon Musk just tweeted "Doge 🚀🌕". Posted 2 minutes ago, 45k likes. DOGE at $0.142, volume up 3.4x in last 15 minutes.',
   },
   {
-    label: '📋 New Listing',
+    label: '📋 Nova Listagem',
     type: 'NEWS_SIGNAL' as SignalType,
     text: 'Coinbase Pro listing announcement: PEPE/USD going live in 48 hours. Currently on DEX only at $0.0000143. Volume ~$8M/day. No price move yet.',
   },
   {
-    label: '⚖️ SEC Action',
+    label: '⚖️ Ação da SEC',
     type: 'MACRO_EVENT' as SignalType,
     text: 'SEC announces emergency enforcement action against Binance.US. Trading halt expected. BTC -2.1% in 5 mins, ETH -3.4%. Volume spiking 8x across all pairs.',
   },
@@ -80,8 +80,8 @@ function actionMeta(action: string) {
 }
 
 function sentimentColor(s: string) {
-  if (s === 'BULLISH') return 'text-accent-green';
-  if (s === 'BEARISH') return 'text-accent-red';
+  if (s === 'ALTISTA') return 'text-accent-green';
+  if (s === 'BAIXISTA') return 'text-accent-red';
   return 'text-accent-yellow';
 }
 
@@ -244,9 +244,9 @@ function DecisionCard({ d }: { d: TradingDecision }) {
   );
 }
 
-// ── History row ───────────────────────────────────────────────
+// ── Histórico row ───────────────────────────────────────────────
 
-function HistoryRow({ d, onClick }: { d: TradingDecision; onClick: () => void }) {
+function HistóricoRow({ d, onClick }: { d: TradingDecision; onClick: () => void }) {
   const am = actionMeta(d.action);
   return (
     <button
@@ -274,7 +274,7 @@ export default function TradingEnginePage() {
   const [loading,    setLoading]    = useState(false);
   const [result,     setResult]     = useState<TradingDecision | null>(null);
   const [error,      setError]      = useState('');
-  const [history,    setHistory]    = useState<TradingDecision[]>([]);
+  const [history,    setHistórico]    = useState<TradingDecision[]>([]);
   const [activeTab,  setActiveTab]  = useState<'analyze' | 'history'>('analyze');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -293,7 +293,7 @@ export default function TradingEnginePage() {
       const data = res.data.data as TradingDecision;
       data.id    = data.id ?? crypto.randomUUID();
       setResult(data);
-      setHistory((h) => [data, ...h].slice(0, 20));
+      setHistórico((h) => [data, ...h].slice(0, 20));
     } catch (err: any) {
       const msg = err?.response?.data?.error ?? err?.message ?? 'Analysis failed';
       setError(msg);
@@ -321,10 +321,10 @@ export default function TradingEnginePage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-text-primary font-display leading-none">
-              Trading Decision Engine
+              Motor de Decisão de Trading
             </h1>
             <p className="text-sm text-text-muted mt-1">
-              Paste any market signal — news, tweet, whale alert, macro event. Get an instant hedge-fund-grade decision.
+              Cole qualquer sinal de mercado — notícia, tweet, alerta de baleia, evento macro. Obtenha uma decisão instantânea de nível institucional.
             </p>
           </div>
         </div>
@@ -334,8 +334,8 @@ export default function TradingEnginePage() {
           <div className="flex items-center gap-3 p-4 rounded-xl bg-accent-yellow/5 border border-accent-yellow/20">
             <AlertTriangle className="w-5 h-5 text-accent-yellow flex-shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-text-primary">PRO feature</p>
-              <p className="text-xs text-text-muted">Upgrade your plan to access the Trading Decision Engine.</p>
+              <p className="text-sm font-semibold text-text-primary">Recurso PRO</p>
+              <p className="text-xs text-text-muted">Fazer Upgrade your plan to access the Motor de Decisão de Trading.</p>
             </div>
           </div>
         )}
@@ -352,13 +352,13 @@ export default function TradingEnginePage() {
                   : 'text-text-muted hover:text-text-secondary'
               }`}
             >
-              {t === 'analyze' ? <Sparkles className="w-3.5 h-3.5" /> : <History className="w-3.5 h-3.5" />}
-              {t === 'analyze' ? 'Analyze' : `History ${history.length > 0 ? `(${history.length})` : ''}`}
+              {t === 'analyze' ? <Sparkles className="w-3.5 h-3.5" /> : <Histórico className="w-3.5 h-3.5" />}
+              {t === 'analyze' ? 'Analisar' : `Histórico ${history.length > 0 ? `(${history.length})` : ''}`}
             </button>
           ))}
         </div>
 
-        {/* Analyze tab */}
+        {/* Analisar tab */}
         {activeTab === 'analyze' && (
           <div className="space-y-4">
 
@@ -403,7 +403,7 @@ export default function TradingEnginePage() {
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') analyze(); }}
                 disabled={!isPro}
-                placeholder="Paste any market signal here — news headline, tweet, whale alert, macro event, price action..."
+                placeholder="Cole qualquer sinal de mercado here — news headline, tweet, whale alert, macro event, price action..."
                 rows={5}
                 className="w-full bg-bg-secondary border border-bg-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted resize-y focus:outline-none focus:border-accent-cyan/40 transition-colors disabled:opacity-40 font-mono"
               />
@@ -412,7 +412,7 @@ export default function TradingEnginePage() {
               </div>
             </div>
 
-            {/* Analyze button */}
+            {/* Analisar button */}
             <button
               onClick={analyze}
               disabled={!isPro || loading || !text.trim()}
@@ -422,9 +422,9 @@ export default function TradingEnginePage() {
                 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" />Running decision engine...</>
+                <><Loader2 className="w-4 h-4 animate-spin" />Executando motor de decisão...</>
               ) : (
-                <><Send className="w-4 h-4" />Analyze Signal</>
+                <><Send className="w-4 h-4" />Analisar Signal</>
               )}
             </button>
 
@@ -443,28 +443,28 @@ export default function TradingEnginePage() {
           </div>
         )}
 
-        {/* History tab */}
+        {/* Histórico tab */}
         {activeTab === 'history' && (
           <div className="space-y-2">
             {history.length === 0 ? (
               <div className="text-center py-16 text-text-muted">
                 <Target className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                <p className="text-sm">No decisions yet. Analyze a signal first.</p>
+                <p className="text-sm">No decisions yet. Analisar a signal first.</p>
               </div>
             ) : (
               <>
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-xs text-text-muted">{history.length} decision{history.length !== 1 ? 's' : ''} this session</span>
                   <button
-                    onClick={() => setHistory([])}
+                    onClick={() => setHistórico([])}
                     className="flex items-center gap-1 text-xs text-text-muted hover:text-accent-red transition-colors"
                   >
                     <RotateCcw className="w-3 h-3" />
-                    Clear
+                    Limpar
                   </button>
                 </div>
                 {history.map((d) => (
-                  <HistoryRow
+                  <HistóricoRow
                     key={d.id}
                     d={d}
                     onClick={() => { setResult(d); setActiveTab('analyze'); }}
@@ -477,7 +477,7 @@ export default function TradingEnginePage() {
 
         {/* Disclaimer */}
         <p className="text-center text-[10px] text-text-muted uppercase tracking-widest pb-4">
-          Not financial advice · Informational purposes only
+          Não é conselho financeiro · Apenas para fins informativos
         </p>
       </div>
     </div>

@@ -12,16 +12,16 @@ interface TokenTableProps {
   liveTickers: Record<string, MarketTicker>;
 }
 
-type SortKey = 'symbol' | 'price' | 'priceChangePercent24h' | 'quoteVolume24h';
+type OrdenarKey = 'symbol' | 'price' | 'priceChangePercent24h' | 'quoteVolume24h';
 
 export function TokenTable({ tokens, liveTickers }: TokenTableProps) {
-  const [sortKey, setSortKey] = useState<SortKey>('quoteVolume24h');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [sortKey, setOrdenarKey] = useState<OrdenarKey>('quoteVolume24h');
+  const [sortDir, setOrdenarDir] = useState<'asc' | 'desc'>('desc');
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
 
-  const handleSort = (key: SortKey) => {
+  const handleOrdenar = (key: OrdenarKey) => {
     if (sortKey === key) setDir((d) => d === 'asc' ? 'desc' : 'asc');
-    else { setSortKey(key); setSortDir('desc'); }
+    else { setOrdenarKey(key); setOrdenarDir('desc'); }
   };
 
   // Merge static token list with live prices
@@ -49,13 +49,13 @@ export function TokenTable({ tokens, liveTickers }: TokenTableProps) {
       setWatchlist((prev) => {
         const next = new Set(prev);
         if (next.has(symbol)) { next.delete(symbol); toast.info(`Removed ${symbol} from watchlist`); }
-        else { next.add(symbol); toast.success(`Added ${symbol} to watchlist`); }
+        else { next.add(symbol); toast.success(`Adicionared ${symbol} to watchlist`); }
         return next;
       });
     } catch { toast.error('Failed to update watchlist'); }
   };
 
-  const setDir = setSortDir;
+  const setDir = setOrdenarDir;
 
   return (
     <div className="overflow-auto max-h-96">
@@ -63,14 +63,14 @@ export function TokenTable({ tokens, liveTickers }: TokenTableProps) {
         <thead className="sticky top-0 bg-bg-card z-10">
           <tr className="border-b border-bg-border">
             {[
-              { key: 'symbol', label: 'PAIR' },
-              { key: 'price', label: 'PRICE' },
+              { key: 'symbol', label: 'PAR' },
+              { key: 'price', label: 'PREÇO' },
               { key: 'priceChangePercent24h', label: '24H %' },
               { key: 'quoteVolume24h', label: 'VOLUME' },
             ].map(({ key, label }) => (
               <th
                 key={key}
-                onClick={() => handleSort(key as SortKey)}
+                onClick={() => handleOrdenar(key as OrdenarKey)}
                 className="px-4 py-3 text-left text-text-muted font-mono text-xs cursor-pointer hover:text-text-secondary select-none"
               >
                 <div className="flex items-center gap-1">

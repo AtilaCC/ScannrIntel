@@ -10,8 +10,8 @@ interface AIInsightsFeedProps {
 }
 
 function SentimentIcon({ sentiment }: { sentiment: string }) {
-  if (sentiment === 'BULLISH') return <TrendingUp className="w-3.5 h-3.5 text-accent-green" />;
-  if (sentiment === 'BEARISH') return <TrendingDown className="w-3.5 h-3.5 text-accent-red" />;
+  if (sentiment === 'ALTISTA') return <TrendingUp className="w-3.5 h-3.5 text-accent-green" />;
+  if (sentiment === 'BAIXISTA') return <TrendingDown className="w-3.5 h-3.5 text-accent-red" />;
   return <Minus className="w-3.5 h-3.5 text-text-muted" />;
 }
 
@@ -32,8 +32,8 @@ function InsightCard({ insight }: { insight: any }) {
   const [expanded, setExpanded] = useState(false);
 
   const sentimentColor =
-    insight.sentiment === 'BULLISH' ? 'text-accent-green' :
-    insight.sentiment === 'BEARISH' ? 'text-accent-red' : 'text-text-muted';
+    insight.sentiment === 'ALTISTA' ? 'text-accent-green' :
+    insight.sentiment === 'BAIXISTA' ? 'text-accent-red' : 'text-text-muted';
 
   return (
     <motion.div
@@ -151,8 +151,8 @@ export function AIInsightsFeed({ insights }: AIInsightsFeedProps) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-text-muted">
         <Brain className="w-10 h-10 mb-3 opacity-20" />
-        <p className="text-sm">Waiting for market signals to analyze...</p>
-        <p className="text-xs mt-1 font-mono opacity-60">AI engine ready</p>
+        <p className="text-sm">Aguardando sinais de mercado...</p>
+        <p className="text-xs mt-1 font-mono opacity-60">Motor de IA pronto</p>
       </div>
     );
   }

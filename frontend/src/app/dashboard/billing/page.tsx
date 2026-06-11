@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   CreditCard, Zap, Shield, BarChart2, Bell, Brain,
-  CheckCircle, XCircle, RefreshCw, ExternalLink, AlertTriangle,
+  CheckCircle, XCircle, AtualizarCw, ExternalLink, AlertTriangle,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
@@ -55,7 +55,7 @@ function UsageBar({ label, current, limit, icon: Icon }: {
   const isUnlimited = limit === -1;
   const pct         = isUnlimited ? 0 : Math.min(100, (current / limit) * 100);
   const isWarning   = pct >= 80;
-  const isCritical  = pct >= 95;
+  const isCrítico  = pct >= 95;
 
   return (
     <div className="space-y-2">
@@ -72,7 +72,7 @@ function UsageBar({ label, current, limit, icon: Icon }: {
         {!isUnlimited && (
           <motion.div
             className={`h-full rounded-full ${
-              isCritical ? 'bg-red-500' : isWarning ? 'bg-yellow-500' : 'bg-accent-cyan'
+              isCrítico ? 'bg-red-500' : isWarning ? 'bg-yellow-500' : 'bg-accent-cyan'
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
@@ -117,12 +117,12 @@ export default function BillingPage() {
   const [usage,     setUsage]    = useState<UsageSummary | null>(null);
   const [invoices,  setInvoices] = useState<Invoice[]>([]);
   const [loading,   setLoading]  = useState(true);
-  const [canceling, setCanceling]= useState(false);
+  const [canceling, setCancelaring]= useState(false);
   const [interval,  setInterval] = useState<'MONTHLY' | 'ANNUAL'>('MONTHLY');
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchTodos(); }, []);
 
-  const fetchAll = async () => {
+  const fetchTodos = async () => {
     setLoading(true);
     try {
       const [subRes, usageRes, invRes] = await Promise.all([
@@ -137,42 +137,42 @@ export default function BillingPage() {
     finally   { setLoading(false); }
   };
 
-  const handleUpgrade = async (plan: 'PRO' | 'ENTERPRISE') => {
+  const handleFazer Upgrade = async (plan: 'PRO' | 'ENTERPRISE') => {
     try {
       const res = await api.post('/subscriptions/checkout', { plan, interval });
       const { checkoutUrl, mock } = res.data.data;
       if (mock) {
         toast.info('Stripe not configured — simulating upgrade');
-        await fetchAll();
+        await fetchTodos();
       } else {
         window.location.href = checkoutUrl;
       }
     } catch { toast.error('Failed to start checkout'); }
   };
 
-  const handleCancel = async () => {
-    if (!confirm('Cancel your subscription? You keep access until the end of the billing period.')) return;
-    setCanceling(true);
+  const handleCancelar = async () => {
+    if (!confirm('Cancelar your subscription? You keep access until the end of the billing period.')) return;
+    setCancelaring(true);
     try {
       await api.post('/subscriptions/cancel');
       toast.success('Subscription will cancel at period end');
-      await fetchAll();
+      await fetchTodos();
     } catch { toast.error('Failed to cancel'); }
-    finally { setCanceling(false); }
+    finally { setCancelaring(false); }
   };
 
   const handleReactivate = async () => {
     try {
       await api.post('/subscriptions/reactivate');
       toast.success('Subscription reactivated');
-      await fetchAll();
+      await fetchTodos();
     } catch { toast.error('Failed to reactivate'); }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24 text-text-muted">
-        <RefreshCw className="w-6 h-6 animate-spin mr-3" />
+        <AtualizarCw className="w-6 h-6 animate-spin mr-3" />
         Loading billing info...
       </div>
     );
@@ -182,7 +182,7 @@ export default function BillingPage() {
   const isPro      = plan === 'PRO';
   const isEnt      = plan === 'ENTERPRISE';
   const isPaid     = isPro || isEnt;
-  const isCanceled = sub?.cancelAtPeriodEnd;
+  const isCancelared = sub?.cancelAtPeriodEnd;
 
   return (
     <div className="p-6 space-y-6 max-w-5xl">
@@ -194,8 +194,8 @@ export default function BillingPage() {
         </p>
       </div>
 
-      {/* Cancellation warning */}
-      {isCanceled && (
+      {/* Cancelarlation warning */}
+      {isCancelared && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -218,7 +218,7 @@ export default function BillingPage() {
         </motion.div>
       )}
 
-      {/* Current plan card */}
+      {/* Plano atual card */}
       <div className="glass-card rounded-xl p-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
@@ -226,7 +226,7 @@ export default function BillingPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-display text-xl font-bold text-text-primary">
-                  {sub?.planDetails?.displayName ?? 'Free'} Plan
+                  {sub?.planDetails?.displayName ?? 'Grátis'} Plan
                 </h2>
                 <span className={`text-xs font-mono px-2 py-0.5 rounded border ${
                   sub?.status === 'ACTIVE'   ? 'bg-green-500/10 border-green-500/30 text-green-400' :
@@ -250,21 +250,21 @@ export default function BillingPage() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {isPaid && !isCanceled && (
+            {isPaid && !isCancelared && (
               <button
-                onClick={handleCancel}
+                onClick={handleCancelar}
                 disabled={canceling}
                 className="px-4 py-2 text-sm text-text-muted border border-bg-border rounded-lg hover:border-red-500/50 hover:text-red-400 transition-all disabled:opacity-50"
               >
-                {canceling ? 'Canceling...' : 'Cancel plan'}
+                {canceling ? 'Cancelaring...' : 'Cancelar plan'}
               </button>
             )}
             {!isEnt && (
               <button
-                onClick={() => handleUpgrade(isPro ? 'ENTERPRISE' : 'PRO')}
+                onClick={() => handleFazer Upgrade(isPro ? 'ENTERPRISE' : 'PRO')}
                 className="px-4 py-2 text-sm bg-accent-cyan text-bg-primary rounded-lg font-display font-bold hover:bg-accent-cyan/90 transition-all shadow-glow-cyan"
               >
-                {isPro ? 'Upgrade to Enterprise' : 'Upgrade to Pro'}
+                {isPro ? 'Fazer Upgrade to Enterprise' : 'Fazer Upgrade to Pro'}
               </button>
             )}
           </div>
@@ -279,7 +279,7 @@ export default function BillingPage() {
               <BarChart2 className="w-4 h-4 text-accent-cyan" />
               Current Usage
             </h3>
-            <UsageBar label="AI Insights (today)"  current={usage.aiInsights.today}  limit={usage.aiInsights.limit}   icon={Brain}   />
+            <UsageBar label="Insights de IA (today)"  current={usage.aiInsights.today}  limit={usage.aiInsights.limit}   icon={Brain}   />
             <UsageBar label="Active Alerts"         current={usage.alerts.current}     limit={usage.alerts.limit}       icon={Bell}    />
             <UsageBar label="Watchlist Symbols"     current={usage.watchlist.current}  limit={usage.watchlist.limit}    icon={BarChart2} />
             {isPaid && (
@@ -298,7 +298,7 @@ export default function BillingPage() {
             <FeatureRow label="Watchlist symbols" value={sub.planDetails.features.maxWatchlistSymbols} />
             <FeatureRow label="Active alerts"     value={sub.planDetails.features.maxAlerts} />
             <FeatureRow label="AI insights/day"   value={sub.planDetails.features.aiInsightsPerDay} />
-            <FeatureRow label="Signal history"    value={`${sub.planDetails.features.signalHistory}d`} />
+            <FeatureRow label="Signal history"    value={`${sub.planDetails.features.signalHistórico}d`} />
             <FeatureRow label="Token scores"      value={sub.planDetails.features.tokenScores} />
             <FeatureRow label="Score leaderboard" value={sub.planDetails.features.scoreLeaderboard} />
             <FeatureRow label="API access"        value={sub.planDetails.features.apiAccess} />
@@ -330,7 +330,7 @@ export default function BillingPage() {
         </div>
         <div className="grid grid-cols-3 divide-x divide-bg-border">
           {[
-            { tier: 'FREE',       price: 0,   annual: 0,   badge: '🆓', name: 'Free'       },
+            { tier: 'FREE',       price: 0,   annual: 0,   badge: '🆓', name: 'Grátis'       },
             { tier: 'PRO',        price: 49,  annual: 470, badge: '⚡', name: 'Pro'        },
             { tier: 'ENTERPRISE', price: 299, annual: 2870,badge: '🏢', name: 'Enterprise' },
           ].map(({ tier, price, annual, badge, name }) => (
@@ -357,7 +357,7 @@ export default function BillingPage() {
                 </div>
               ) : (
                 <button
-                  onClick={() => tier !== 'FREE' && handleUpgrade(tier as 'PRO' | 'ENTERPRISE')}
+                  onClick={() => tier !== 'FREE' && handleFazer Upgrade(tier as 'PRO' | 'ENTERPRISE')}
                   disabled={tier === 'FREE'}
                   className={`w-full text-xs py-1.5 rounded font-bold transition-all ${
                     tier === 'FREE'
@@ -365,7 +365,7 @@ export default function BillingPage() {
                       : 'bg-accent-cyan text-bg-primary hover:bg-accent-cyan/90'
                   }`}
                 >
-                  {tier === 'FREE' ? 'Downgrade' : `Upgrade to ${name}`}
+                  {tier === 'FREE' ? 'Downgrade' : `Fazer Upgrade to ${name}`}
                 </button>
               )}
             </div>
@@ -378,7 +378,7 @@ export default function BillingPage() {
         <div className="glass-card rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-bg-border flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-text-muted" />
-            <h3 className="font-display font-bold text-text-primary text-sm">Invoice History</h3>
+            <h3 className="font-display font-bold text-text-primary text-sm">Invoice Histórico</h3>
           </div>
           <div className="divide-y divide-bg-border/50">
             {invoices.map((inv) => (

@@ -18,7 +18,7 @@ const FEATURE_MATRIX = [
       { label: 'Live trading pairs',         free: '10',          pro: '50',          ent: 'Unlimited'  },
       { label: 'Watchlist symbols',          free: '5',           pro: '50',          ent: 'Unlimited'  },
       { label: 'Signal history',             free: '1 day',       pro: '30 days',     ent: '365 days'   },
-      { label: 'Signal types',               free: '2 types',     pro: 'All 7 types', ent: 'All 7 types'},
+      { label: 'Signal types',               free: '2 types',     pro: 'Todos 7 types', ent: 'Todos 7 types'},
       { label: 'Severity filtering',         free: false,         pro: true,          ent: true         },
     ],
   },
@@ -34,12 +34,12 @@ const FEATURE_MATRIX = [
     ],
   },
   {
-    category: 'Alerts',
+    category: 'Alertas',
     icon: Bell,
     rows: [
       { label: 'Active alert configs',       free: '3',           pro: '25',          ent: 'Unlimited'  },
       { label: 'In-app notifications',       free: true,          pro: true,          ent: true         },
-      { label: 'Email notifications',        free: false,         pro: true,          ent: true         },
+      { label: 'E-mail notifications',        free: false,         pro: true,          ent: true         },
       { label: 'Telegram notifications',     free: false,         pro: true,          ent: true         },
     ],
   },
@@ -57,7 +57,7 @@ const FEATURE_MATRIX = [
     category: 'Support',
     icon: Headphones,
     rows: [
-      { label: 'Support level',              free: 'Community',   pro: 'Email',       ent: 'Priority'   },
+      { label: 'Support level',              free: 'Community',   pro: 'E-mail',       ent: 'Priority'   },
       { label: 'Response time',              free: '—',           pro: '< 24 hours',  ent: '< 4 hours'  },
     ],
   },
@@ -126,7 +126,7 @@ function PricingCard({
           </div>
         )}
         {price === 0 && (
-          <div className="text-xs text-text-muted mt-1">Free forever</div>
+          <div className="text-xs text-text-muted mt-1">Grátis forever</div>
         )}
       </div>
 
@@ -154,7 +154,7 @@ function PricingCard({
               : 'bg-bg-tertiary text-text-primary border border-bg-border hover:border-accent-cyan hover:text-accent-cyan'
           }`}
         >
-          {price === 0 ? 'Get Started Free' : `Start ${name}`}
+          {price === 0 ? 'Get Started Grátis' : `Start ${name}`}
           <ArrowRight className="w-4 h-4" />
         </button>
       )}
@@ -169,7 +169,7 @@ export default function PricingPage() {
 
   const plans = [
     {
-      badge: '🆓', name: 'Free', description: 'Get started with real-time market monitoring',
+      badge: '🆓', name: 'Grátis', description: 'Get started with real-time market monitoring',
       price: 0, annualPrice: 0, highlighted: false,
       features: [
         '10 live trading pairs',
@@ -188,10 +188,10 @@ export default function PricingPage() {
         '50 live trading pairs',
         '50 watchlist symbols',
         '100 AI insights per day',
-        'Email + Telegram alerts',
+        'E-mail + Telegram alerts',
         '25 alert configs',
-        'All 7 signal types',
-        'Token risk/opportunity scores',
+        'Todos 7 signal types',
+        'Token risk/pontuações de oportunidade',
         'Score leaderboards',
         'REST API (60 req/min)',
         'CSV / JSON export',
@@ -204,7 +204,7 @@ export default function PricingPage() {
       features: [
         'Unlimited pairs & watchlist',
         'Unlimited AI insights',
-        'All Pro features',
+        'Todos Pro features',
         '365-day history',
         'REST API (600 req/min)',
         'Priority support (< 4h)',
@@ -248,7 +248,7 @@ export default function PricingPage() {
             Simple, transparent pricing
           </motion.h1>
           <p className="text-text-secondary text-xl max-w-xl mx-auto">
-            Start free. Upgrade when you need more AI insights, signals, and alerts.
+            Start free. Fazer Upgrade when you need more AI insights, signals, and alerts.
           </p>
 
           {/* Billing toggle */}
@@ -271,7 +271,7 @@ export default function PricingPage() {
             </span>
             {interval === 'annual' && (
               <span className="text-xs text-accent-green font-mono bg-accent-green/10 border border-accent-green/20 px-2 py-0.5 rounded-full">
-                Save 20%
+                Salvar 20%
               </span>
             )}
           </div>
@@ -305,7 +305,7 @@ export default function PricingPage() {
               {/* Header row */}
               <div className="grid grid-cols-4 px-5 py-2 border-b border-bg-border/50 text-xs font-mono text-text-muted">
                 <div>Feature</div>
-                <div className="text-center">Free</div>
+                <div className="text-center">Grátis</div>
                 <div className="text-center text-accent-cyan">Pro</div>
                 <div className="text-center">Enterprise</div>
               </div>

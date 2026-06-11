@@ -3,11 +3,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ShieldAlert, TrendingUp, RefreshCw, ArrowUpDown,
+  ShieldAlert, TrendingUp, AtualizarCw, ArrowUpDown,
   Brain, Activity, Trophy, Zap,
 } from 'lucide-react';
 import { ScoreMeter } from '@/components/insights/ScoreMeter';
-import { UpgradePrompt } from '@/components/billing/PlanBadge';
+import { Fazer UpgradePrompt } from '@/components/billing/PlanBadge';
 import { api } from '@/lib/api';
 import { useMarketStore } from '@/store/marketStore';
 import { useAuthStore } from '@/store/authStore';
@@ -19,7 +19,7 @@ interface TokenScoreRow {
   symbol:           string;
   riskScore:        number;
   opportunityScore: number;
-  sentiment:        'BULLISH' | 'BEARISH' | 'NEUTRAL';
+  sentiment:        'ALTISTA' | 'BAIXISTA' | 'NEUTRO';
   computedAt:       string;
   factors?:         any[];
   compositeRisk?:   number;
@@ -33,7 +33,7 @@ interface TokenScoreRow {
 interface LeaderEntry { rank: number; symbol: string; score: number; sentiment: string; }
 
 type ViewMode  = 'grid' | 'leaderboard';
-type SortField = 'risk' | 'opportunity' | 'symbol';
+type OrdenarField = 'risk' | 'opportunity' | 'symbol';
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -95,10 +95,10 @@ export default function ScoresPage() {
   const [oppLeader,   setOppLeader]   = useState<LeaderEntry[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [view,        setView]        = useState<ViewMode>('grid');
-  const [sortField,   setSortField]   = useState<SortField>('risk');
-  const [sortDir,     setSortDir]     = useState<'asc' | 'desc'>('desc');
+  const [sortField,   setOrdenarField]   = useState<OrdenarField>('risk');
+  const [sortDir,     setOrdenarDir]     = useState<'asc' | 'desc'>('desc');
   const [selected,    setSelected]    = useState<TokenScoreRow | null>(null);
-  const [filterSentiment, setFilterSentiment] = useState<string>('All');
+  const [filterSentiment, setFiltrarSentiment] = useState<string>('Todos');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -130,8 +130,8 @@ export default function ScoresPage() {
   if (plan === 'FREE') {
     return (
       <div className="p-6">
-        <UpgradePrompt
-          feature="Token Scores"
+        <Fazer UpgradePrompt
+          feature="Pontuações de Tokens"
           requiredPlan="PRO"
           currentPlan="FREE"
         />
@@ -139,14 +139,14 @@ export default function ScoresPage() {
     );
   }
 
-  // ── Sorting ───────────────────────────────────────────────
-  const handleSort = (field: SortField) => {
-    if (sortField === field) setSortDir((d) => d === 'asc' ? 'desc' : 'asc');
-    else { setSortField(field); setSortDir('desc'); }
+  // ── Ordenaring ───────────────────────────────────────────────
+  const handleOrdenar = (field: OrdenarField) => {
+    if (sortField === field) setOrdenarDir((d) => d === 'asc' ? 'desc' : 'asc');
+    else { setOrdenarField(field); setOrdenarDir('desc'); }
   };
 
   const sorted = [...scores]
-    .filter((s) => filterSentiment === 'All' || s.sentiment === filterSentiment)
+    .filter((s) => filterSentiment === 'Todos' || s.sentiment === filterSentiment)
     .sort((a, b) => {
       const mul = sortDir === 'desc' ? -1 : 1;
       if (sortField === 'risk')        return mul * (a.riskScore        - b.riskScore);
@@ -165,9 +165,9 @@ export default function ScoresPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-text-primary">Token Scores</h1>
+          <h1 className="font-display text-2xl font-bold text-text-primary">Pontuações de Tokens</h1>
           <p className="text-text-secondary text-sm mt-1">
-            AI-calibrated risk &amp; opportunity scores · Rule-based + Claude analysis
+            Risco calibrado por IA &amp; pontuações de oportunidade · Rule-based + Claude analysis
           </p>
         </div>
         <button
@@ -175,8 +175,8 @@ export default function ScoresPage() {
           disabled={loading}
           className="flex items-center gap-2 px-3 py-2 bg-bg-secondary border border-bg-border rounded-lg text-text-secondary hover:border-accent-cyan hover:text-accent-cyan text-sm transition-all"
         >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
+          <AtualizarCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Atualizar
         </button>
       </div>
 
@@ -216,14 +216,14 @@ export default function ScoresPage() {
 
         {/* Sentiment filter */}
         <div className="flex gap-1.5">
-          {['All', 'BULLISH', 'NEUTRAL', 'BEARISH'].map((s) => (
+          {['Todos', 'ALTISTA', 'NEUTRO', 'BAIXISTA'].map((s) => (
             <button
               key={s}
-              onClick={() => setFilterSentiment(s)}
+              onClick={() => setFiltrarSentiment(s)}
               className={`px-3 py-1 rounded-full text-xs font-mono transition-all ${
                 filterSentiment === s
-                  ? s === 'BULLISH' ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                  : s === 'BEARISH' ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  ? s === 'ALTISTA' ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : s === 'BAIXISTA' ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                   : 'bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30'
                   : 'bg-bg-secondary text-text-muted border border-bg-border hover:text-text-secondary'
               }`}
@@ -236,7 +236,7 @@ export default function ScoresPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-text-muted">
-          <RefreshCw className="w-6 h-6 animate-spin mr-3" />
+          <AtualizarCw className="w-6 h-6 animate-spin mr-3" />
           Loading scores...
         </div>
       ) : (
@@ -251,12 +251,12 @@ export default function ScoresPage() {
                     {sorted.length} Scored Tokens
                   </h2>
                 </div>
-                {/* Sort controls */}
+                {/* Ordenar controls */}
                 <div className="flex gap-2">
-                  {(['risk', 'opportunity', 'symbol'] as SortField[]).map((f) => (
+                  {(['risk', 'opportunity', 'symbol'] as OrdenarField[]).map((f) => (
                     <button
                       key={f}
-                      onClick={() => handleSort(f)}
+                      onClick={() => handleOrdenar(f)}
                       className={`px-2 py-1 rounded text-xs font-mono flex items-center gap-1 transition-all ${
                         sortField === f
                           ? 'text-accent-cyan bg-accent-cyan/10'
@@ -274,12 +274,12 @@ export default function ScoresPage() {
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-bg-card z-10">
                     <tr className="border-b border-bg-border">
-                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">PAIR</th>
-                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">PRICE</th>
+                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">PAR</th>
+                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">PREÇO</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">RISK</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">OPPORTUNITY</th>
-                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">SENTIMENT</th>
-                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">UPDATED</th>
+                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">SENTIMENTO</th>
+                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">ATUALIZADO</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -288,8 +288,8 @@ export default function ScoresPage() {
                         const live       = tickers[row.symbol];
                         const price      = live?.price ?? 0;
                         const sentColour =
-                          row.sentiment === 'BULLISH' ? 'text-accent-green' :
-                          row.sentiment === 'BEARISH' ? 'text-accent-red'   : 'text-text-muted';
+                          row.sentiment === 'ALTISTA' ? 'text-accent-green' :
+                          row.sentiment === 'BAIXISTA' ? 'text-accent-red'   : 'text-text-muted';
 
                         return (
                           <motion.tr
@@ -342,7 +342,7 @@ export default function ScoresPage() {
               <div className="glass-card rounded-xl overflow-hidden">
                 <div className="flex items-center gap-2 px-5 py-4 border-b border-bg-border">
                   <ShieldAlert className="w-4 h-4 text-red-400" />
-                  <h2 className="font-display font-bold text-text-primary text-sm">Highest Risk</h2>
+                  <h2 className="font-display font-bold text-text-primary text-sm">Maior Risco</h2>
                 </div>
                 <div className="divide-y divide-bg-border/50">
                   {riskLeader.map((entry) => (
@@ -365,7 +365,7 @@ export default function ScoresPage() {
                   ))}
                   {riskLeader.length === 0 && (
                     <div className="py-10 text-center text-text-muted text-sm">
-                      No score data yet
+                      Sem dados de pontuação ainda
                     </div>
                   )}
                 </div>
@@ -375,7 +375,7 @@ export default function ScoresPage() {
               <div className="glass-card rounded-xl overflow-hidden">
                 <div className="flex items-center gap-2 px-5 py-4 border-b border-bg-border">
                   <TrendingUp className="w-4 h-4 text-emerald-400" />
-                  <h2 className="font-display font-bold text-text-primary text-sm">Best Opportunity</h2>
+                  <h2 className="font-display font-bold text-text-primary text-sm">Melhor Oportunidade</h2>
                 </div>
                 <div className="divide-y divide-bg-border/50">
                   {oppLeader.map((entry) => (
@@ -398,7 +398,7 @@ export default function ScoresPage() {
                   ))}
                   {oppLeader.length === 0 && (
                     <div className="py-10 text-center text-text-muted text-sm">
-                      No score data yet
+                      Sem dados de pontuação ainda
                     </div>
                   )}
                 </div>

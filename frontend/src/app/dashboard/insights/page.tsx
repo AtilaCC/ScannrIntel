@@ -2,30 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, RefreshCw, Filter } from 'lucide-react';
+import { Brain, AtualizarCw, Filtrar } from 'lucide-react';
 import { insightApi } from '@/lib/api';
 import { useMarketStore } from '@/store/marketStore';
 import { AIInsightsFeed } from '@/components/insights/AIInsightsFeed';
 import { toast } from 'sonner';
 
-const SYMBOLS = ['All', 'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT'];
-const SENTIMENTS = ['All', 'BULLISH', 'BEARISH', 'NEUTRAL'];
+const SYMBOLS = ['Todos', 'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT'];
+const SENTIMENTOS = ['Todos', 'ALTISTA', 'BAIXISTA', 'NEUTRO'];
 
 export default function InsightsPage() {
   const { insights: liveInsights } = useMarketStore();
   const [historicalInsights, setHistoricalInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterSymbol, setFilterSymbol] = useState('All');
-  const [filterSentiment, setFilterSentiment] = useState('All');
+  const [filterSymbol, setFiltrarSymbol] = useState('Todos');
+  const [filterSentiment, setFiltrarSentiment] = useState('Todos');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
   const fetchInsights = async (p = 1) => {
     setLoading(true);
     try {
-      const res = await insightApi.getAll({
+      const res = await insightApi.getTodos({
         page: p,
-        symbol: filterSymbol === 'All' ? undefined : filterSymbol,
+        symbol: filterSymbol === 'Todos' ? undefined : filterSymbol,
       });
       setHistoricalInsights(p === 1 ? res.data.data : (prev: any) => [...prev, ...res.data.data]);
       setTotal(res.data.meta?.total || 0);
@@ -37,15 +37,15 @@ export default function InsightsPage() {
 
   const allInsights = [...liveInsights, ...historicalInsights]
     .filter((ins, i, arr) => arr.findIndex((x) => x.id === ins.id) === i)
-    .filter((ins) => filterSentiment === 'All' || ins.sentiment === filterSentiment);
+    .filter((ins) => filterSentiment === 'Todos' || ins.sentiment === filterSentiment);
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-text-primary">AI Insights</h1>
+          <h1 className="font-display text-2xl font-bold text-text-primary">Insights de IA</h1>
           <p className="text-text-secondary text-sm mt-1">
-            Market analysis powered by{' '}
+            Análise de mercado por{' '}
             <span className="text-accent-purple font-semibold">Claude AI</span>
           </p>
         </div>
@@ -54,12 +54,12 @@ export default function InsightsPage() {
           disabled={loading}
           className="flex items-center gap-2 px-3 py-2 bg-bg-secondary border border-bg-border rounded-lg text-text-secondary hover:border-accent-cyan hover:text-accent-cyan text-sm transition-all"
         >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
+          <AtualizarCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Atualizar
         </button>
       </div>
 
-      {/* Filters */}
+      {/* Filtrars */}
       <div className="flex flex-wrap gap-3">
         <div>
           <div className="text-text-muted text-xs font-mono mb-1.5 uppercase">Symbol</div>
@@ -67,14 +67,14 @@ export default function InsightsPage() {
             {SYMBOLS.map((s) => (
               <button
                 key={s}
-                onClick={() => setFilterSymbol(s)}
+                onClick={() => setFiltrarSymbol(s)}
                 className={`px-3 py-1 rounded-full text-xs font-mono transition-all ${
                   filterSymbol === s
                     ? 'bg-accent-purple/20 text-accent-purple border border-accent-purple/30'
                     : 'bg-bg-secondary text-text-muted border border-bg-border hover:border-text-muted'
                 }`}
               >
-                {s === 'All' ? 'All' : s.replace('USDT', '')}
+                {s === 'Todos' ? 'Todos' : s.replace('USDT', '')}
               </button>
             ))}
           </div>
@@ -82,14 +82,14 @@ export default function InsightsPage() {
         <div>
           <div className="text-text-muted text-xs font-mono mb-1.5 uppercase">Sentiment</div>
           <div className="flex gap-1.5">
-            {SENTIMENTS.map((s) => (
+            {SENTIMENTOS.map((s) => (
               <button
                 key={s}
-                onClick={() => setFilterSentiment(s)}
+                onClick={() => setFiltrarSentiment(s)}
                 className={`px-3 py-1 rounded-full text-xs font-mono transition-all ${
                   filterSentiment === s
-                    ? s === 'BULLISH' ? 'bg-accent-green/20 text-accent-green border border-accent-green/30'
-                    : s === 'BEARISH' ? 'bg-accent-red/20 text-accent-red border border-accent-red/30'
+                    ? s === 'ALTISTA' ? 'bg-accent-green/20 text-accent-green border border-accent-green/30'
+                    : s === 'BAIXISTA' ? 'bg-accent-red/20 text-accent-red border border-accent-red/30'
                     : 'bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30'
                     : 'bg-bg-secondary text-text-muted border border-bg-border hover:border-text-muted'
                 }`}
@@ -104,9 +104,9 @@ export default function InsightsPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Total Insights', value: total, color: 'text-accent-purple' },
-          { label: 'Bullish', value: allInsights.filter((i) => i.sentiment === 'BULLISH').length, color: 'text-accent-green' },
-          { label: 'Bearish', value: allInsights.filter((i) => i.sentiment === 'BEARISH').length, color: 'text-accent-red' },
+          { label: 'Total de Insights', value: total, color: 'text-accent-purple' },
+          { label: 'Altista', value: allInsights.filter((i) => i.sentiment === 'ALTISTA').length, color: 'text-accent-green' },
+          { label: 'Baixista', value: allInsights.filter((i) => i.sentiment === 'BAIXISTA').length, color: 'text-accent-red' },
         ].map(({ label, value, color }) => (
           <div key={label} className="glass-card rounded-xl p-4 text-center">
             <div className={`font-display text-2xl font-bold tabular-nums ${color}`}>{value}</div>
@@ -120,13 +120,13 @@ export default function InsightsPage() {
         <div className="flex items-center gap-2 px-5 py-4 border-b border-bg-border">
           <Brain className="w-4 h-4 text-accent-purple" />
           <h2 className="font-display font-bold text-text-primary text-sm">
-            {allInsights.length} insights {filterSentiment !== 'All' && `· ${filterSentiment}`}
+            {allInsights.length} insights {filterSentiment !== 'Todos' && `· ${filterSentiment}`}
           </h2>
         </div>
         <div className="max-h-none">
           {loading && allInsights.length === 0 ? (
             <div className="flex items-center justify-center py-16 text-text-muted">
-              <RefreshCw className="w-6 h-6 animate-spin mr-3" />
+              <AtualizarCw className="w-6 h-6 animate-spin mr-3" />
               Loading insights...
             </div>
           ) : (
@@ -143,7 +143,7 @@ export default function InsightsPage() {
             disabled={loading}
             className="px-6 py-2 bg-bg-secondary border border-bg-border text-text-secondary rounded-lg text-sm hover:border-accent-cyan hover:text-accent-cyan transition-all disabled:opacity-50"
           >
-            {loading ? 'Loading...' : 'Load More'}
+            {loading ? 'Carregando...' : 'Load More'}
           </button>
         </div>
       )}

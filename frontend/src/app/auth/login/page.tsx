@@ -11,9 +11,9 @@ import { toast } from 'sonner';
 export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated, isLoading } = useAuthStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setE-mail] = useState('');
+  const [password, setSenha] = useState('');
+  const [showSenha, setShowSenha] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function LoginPage() {
     setError('');
     try {
       await login(email, password);
-      toast.success('Welcome back!');
+      toast.success('Bem-vindo de volta!');
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
@@ -122,11 +122,11 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-text-secondary text-sm mb-2">Email</label>
+              <label className="block text-text-secondary text-sm mb-2">E-mail</label>
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setE-mail(e.target.value)}
                 required
                 placeholder="you@example.com"
                 className="w-full bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan transition-colors font-mono text-sm"
@@ -134,22 +134,22 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-text-secondary text-sm mb-2">Password</label>
+              <label className="block text-text-secondary text-sm mb-2">Senha</label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showSenha ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => setSenha(e.target.value)}
                   required
                   placeholder="••••••••"
                   className="w-full bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 pr-12 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan transition-colors font-mono text-sm"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowSenha(!showSenha)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
@@ -169,7 +169,7 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full py-3 rounded-lg bg-accent-cyan text-bg-primary font-display font-bold tracking-wide hover:bg-accent-cyan/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-glow-cyan"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Signing in...' : 'Entrar'}
             </button>
           </form>
 

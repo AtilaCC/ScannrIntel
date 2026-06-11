@@ -25,8 +25,8 @@ export default function DashboardPage() {
       try {
         const [ins, sigs, toks, triggered] = await Promise.all([
           insightApi.getLatest(),
-          signalApi.getAll({ limit: 20 }),
-          tokenApi.getAll(),
+          signalApi.getTodos({ limit: 20 }),
+          tokenApi.getTodos(),
           alertApi.getTriggered(),
         ]);
         setLatestInsights(ins.data.data || []);
@@ -90,9 +90,9 @@ export default function DashboardPage() {
       >
         {[
           { label: 'Pairs Monitored', value: totalTickers || 20, icon: Activity, color: 'cyan', suffix: '' },
-          { label: 'Bullish 24h', value: bullish, icon: TrendingUp, color: 'green', suffix: '' },
-          { label: 'Bearish 24h', value: bearish, icon: TrendingDown, color: 'red', suffix: '' },
-          { label: 'Critical Signals', value: criticalSignals, icon: Zap, color: 'yellow', suffix: '' },
+          { label: 'Altista 24h', value: bullish, icon: TrendingUp, color: 'green', suffix: '' },
+          { label: 'Baixista 24h', value: bearish, icon: TrendingDown, color: 'red', suffix: '' },
+          { label: 'Crítico Signals', value: criticalSignals, icon: Zap, color: 'yellow', suffix: '' },
         ].map((stat) => (
           <motion.div key={stat.label} variants={staggered.item}>
             <StatCard {...stat} />
@@ -113,7 +113,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-bg-border">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-accent-cyan" />
-                <h2 className="font-display font-bold text-text-primary text-sm tracking-wide">LIVE PRICES</h2>
+                <h2 className="font-display font-bold text-text-primary text-sm tracking-wide">PREÇOS AO VIVO</h2>
               </div>
               <span className="text-text-muted text-xs font-mono">
                 {totalTickers || tokens.length} pairs
@@ -132,7 +132,7 @@ export default function DashboardPage() {
           <div className="glass-card rounded-xl overflow-hidden h-full">
             <div className="flex items-center gap-2 px-5 py-4 border-b border-bg-border">
               <Zap className="w-4 h-4 text-accent-yellow" />
-              <h2 className="font-display font-bold text-text-primary text-sm tracking-wide">SIGNALS</h2>
+              <h2 className="font-display font-bold text-text-primary text-sm tracking-wide">SINAIS</h2>
               {allSignals.length > 0 && (
                 <span className="ml-auto bg-accent-yellow/20 text-accent-yellow text-xs font-mono px-2 py-0.5 rounded">
                   {allSignals.length}
@@ -144,7 +144,7 @@ export default function DashboardPage() {
         </motion.div>
       </div>
 
-      {/* AI Insights */}
+      {/* Insights de IA */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

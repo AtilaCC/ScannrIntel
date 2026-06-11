@@ -31,7 +31,7 @@ interface ScoreMeterProps {
   symbol:          string;
   riskScore:       number;
   opportunityScore:number;
-  sentiment:       'BULLISH' | 'BEARISH' | 'NEUTRAL';
+  sentiment:       'ALTISTA' | 'BAIXISTA' | 'NEUTRO';
   breakdown?:      ScoreBreakdown;
   computedAt?:     number;
   compact?:        boolean; // condensed mode for table rows
@@ -145,12 +145,12 @@ export function ScoreMeter({
   const [expanded, setExpanded] = useState(false);
 
   const sentimentColour =
-    sentiment === 'BULLISH' ? 'text-accent-green' :
-    sentiment === 'BEARISH' ? 'text-accent-red'   : 'text-text-muted';
+    sentiment === 'ALTISTA' ? 'text-accent-green' :
+    sentiment === 'BAIXISTA' ? 'text-accent-red'   : 'text-text-muted';
 
   const sentimentBg =
-    sentiment === 'BULLISH' ? 'bg-accent-green/10 border-accent-green/20' :
-    sentiment === 'BEARISH' ? 'bg-accent-red/10 border-accent-red/20'     :
+    sentiment === 'ALTISTA' ? 'bg-accent-green/10 border-accent-green/20' :
+    sentiment === 'BAIXISTA' ? 'bg-accent-red/10 border-accent-red/20'     :
     'bg-bg-secondary border-bg-border';
 
   // ── Compact mode (for token table rows) ──────────────────

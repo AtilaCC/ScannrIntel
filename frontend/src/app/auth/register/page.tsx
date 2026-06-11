@@ -14,13 +14,13 @@ const passwordRules = [
   { label: 'One number', test: (p: string) => /[0-9]/.test(p) },
 ];
 
-export default function RegisterPage() {
+export default function RegistrarPage() {
   const router = useRouter();
   const { register, isAuthenticated, isLoading } = useAuthStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setE-mail] = useState('');
+  const [password, setSenha] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showSenha, setShowSenha] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -30,9 +30,9 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (password !== confirm) { setError('Passwords do not match'); return; }
+    if (password !== confirm) { setError('Senhas do not match'); return; }
     if (!passwordRules.every((r) => r.test(password))) {
-      setError('Password does not meet requirements');
+      setError('Senha does not meet requirements');
       return;
     }
     try {
@@ -60,17 +60,17 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <h2 className="font-display text-3xl font-bold text-text-primary">Create account</h2>
+          <h2 className="font-display text-3xl font-bold text-text-primary">Criar conta</h2>
           <p className="text-text-secondary mt-2">Start monitoring markets with AI</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-text-secondary text-sm mb-2">Email</label>
+            <label className="block text-text-secondary text-sm mb-2">E-mail</label>
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setE-mail(e.target.value)}
               required
               placeholder="you@example.com"
               className="w-full bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan transition-colors font-mono text-sm"
@@ -78,25 +78,25 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-text-secondary text-sm mb-2">Password</label>
+            <label className="block text-text-secondary text-sm mb-2">Senha</label>
             <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showSenha ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setSenha(e.target.value)}
                 required
                 placeholder="••••••••"
                 className="w-full bg-bg-secondary border border-bg-border rounded-lg px-4 py-3 pr-12 text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-cyan transition-colors font-mono text-sm"
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowSenha(!showSenha)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {/* Password rules */}
+            {/* Senha rules */}
             {password && (
               <div className="mt-2 space-y-1">
                 {passwordRules.map((rule) => {
@@ -113,7 +113,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-text-secondary text-sm mb-2">Confirm Password</label>
+            <label className="block text-text-secondary text-sm mb-2">Confirm Senha</label>
             <input
               type="password"
               value={confirm}
@@ -146,7 +146,7 @@ export default function RegisterPage() {
         </form>
 
         <p className="text-center text-text-secondary text-sm">
-          Already have an account?{' '}
+          Já tem uma conta?{' '}
           <Link href="/auth/login" className="text-accent-cyan hover:underline">Sign in</Link>
         </p>
       </motion.div>

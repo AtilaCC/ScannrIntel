@@ -5,10 +5,10 @@ import { Zap, TrendingUp, TrendingDown, BarChart2, Fish } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const SIGNAL_ICONS: Record<string, any> = {
-  WHALE_TRADE: Fish,
+  BALEIA_TRADE: Fish,
   VOLUME_SPIKE: BarChart2,
-  PRICE_SURGE: TrendingUp,
-  PRICE_CRASH: TrendingDown,
+  PREÇO_SURGE: TrendingUp,
+  PREÇO_CRASH: TrendingDown,
   ACCUMULATION_PATTERN: TrendingUp,
   DUMP_PATTERN: TrendingDown,
   LIQUIDITY_ANOMALY: Zap,
@@ -30,8 +30,8 @@ export function SignalFeed({ signals }: SignalFeedProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-text-muted">
         <Zap className="w-8 h-8 mb-3 opacity-30" />
-        <p className="text-sm">Monitoring for signals...</p>
-        <p className="text-xs mt-1 font-mono opacity-60">Live analysis active</p>
+        <p className="text-sm">Monitorando sinais...</p>
+        <p className="text-xs mt-1 font-mono opacity-60">Análise ao vivo ativa</p>
       </div>
     );
   }

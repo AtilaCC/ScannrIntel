@@ -9,11 +9,11 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 
 const CONDITIONS = [
-  { value: 'PRICE_ABOVE', label: 'Price rises above' },
-  { value: 'PRICE_BELOW', label: 'Price falls below' },
-  { value: 'PRICE_CHANGE_PERCENT', label: 'Price change % exceeds' },
+  { value: 'PREÇO_ABOVE', label: 'Price rises above' },
+  { value: 'PREÇO_BELOW', label: 'Price falls below' },
+  { value: 'PREÇO_CHANGE_PERCENT', label: 'Price change % exceeds' },
   { value: 'VOLUME_SPIKE_PERCENT', label: 'Volume exceeds (USD)' },
-  { value: 'WHALE_TRADE_SIZE', label: 'Whale trade size (USD)' },
+  { value: 'BALEIA_TRADE_SIZE', label: 'Whale trade size (USD)' },
 ];
 
 const SYMBOLS = [
@@ -29,7 +29,7 @@ export default function AlertsPage() {
   const [tab, setTab] = useState<'configs' | 'triggered'>('configs');
   const [form, setForm] = useState({
     symbol: 'BTCUSDT',
-    condition: 'PRICE_ABOVE',
+    condition: 'PREÇO_ABOVE',
     threshold: '',
     channels: ['IN_APP'],
   });
@@ -41,7 +41,7 @@ export default function AlertsPage() {
   const fetchData = async () => {
     try {
       const [cfgRes, trgRes] = await Promise.all([
-        alertApi.getAll(),
+        alertApi.getTodos(),
         alertApi.getTriggered(),
       ]);
       setConfigs(cfgRes.data.data || []);
@@ -59,7 +59,7 @@ export default function AlertsPage() {
     } catch { toast.error('Failed to create alert'); }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleExcluir = async (id: string) => {
     try {
       await alertApi.delete(id);
       setConfigs((prev) => prev.filter((c) => c.id !== id));
@@ -110,7 +110,7 @@ export default function AlertsPage() {
             exit={{ opacity: 0, y: -20 }}
             className="glass-card rounded-xl p-6 border border-accent-cyan/20"
           >
-            <h3 className="font-display font-bold text-text-primary mb-4">Create Alert</h3>
+            <h3 className="font-display font-bold text-text-primary mb-4">Criar Alerta</h3>
             <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-text-muted text-xs mb-1.5 font-mono uppercase">Symbol</label>
@@ -169,7 +169,7 @@ export default function AlertsPage() {
                   Create
                 </button>
                 <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2 bg-bg-secondary border border-bg-border text-text-secondary rounded-lg text-sm hover:border-text-secondary">
-                  Cancel
+                  Cancelar
                 </button>
               </div>
             </form>
@@ -181,7 +181,7 @@ export default function AlertsPage() {
       <div className="flex gap-1 bg-bg-secondary border border-bg-border rounded-lg p-1 w-fit">
         {[
           { key: 'configs', label: `Configured (${configs.length})` },
-          { key: 'triggered', label: `History (${allTriggered.length})` },
+          { key: 'triggered', label: `Histórico (${allTriggered.length})` },
         ].map(({ key, label }) => (
           <button
             key={key}
@@ -201,7 +201,7 @@ export default function AlertsPage() {
           {configs.length === 0 && (
             <div className="glass-card rounded-xl p-12 text-center text-text-muted">
               <Bell className="w-10 h-10 mx-auto mb-3 opacity-20" />
-              <p>No alerts configured yet</p>
+              <p>Nenhum alerta configurado yet</p>
             </div>
           )}
           {configs.map((cfg) => (
@@ -238,7 +238,7 @@ export default function AlertsPage() {
                 <button onClick={() => handleToggle(cfg.id)} className="text-text-muted hover:text-accent-cyan">
                   {cfg.isActive ? <ToggleRight className="w-5 h-5 text-accent-cyan" /> : <ToggleLeft className="w-5 h-5" />}
                 </button>
-                <button onClick={() => handleDelete(cfg.id)} className="text-text-muted hover:text-accent-red">
+                <button onClick={() => handleExcluir(cfg.id)} className="text-text-muted hover:text-accent-red">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>

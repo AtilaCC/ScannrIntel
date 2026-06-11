@@ -28,26 +28,26 @@ api.interceptors.request.use((config) => {
 // ── API Methods ───────────────────────────────────────────
 
 export const tokenApi = {
-  getAll: () => api.get('/tokens'),
+  getTodos: () => api.get('/tokens'),
   getOne: (symbol: string) => api.get(`/tokens/${symbol}`),
   getWatchlist: () => api.get('/tokens/watchlist/me'),
   toggleWatchlist: (symbol: string) => api.post(`/tokens/${symbol}/watchlist`),
 };
 
 export const signalApi = {
-  getAll: (params?: { page?: number; limit?: number; symbol?: string; type?: string }) =>
+  getTodos: (params?: { page?: number; limit?: number; symbol?: string; type?: string }) =>
     api.get('/signals', { params }),
   getOne: (id: string) => api.get(`/signals/${id}`),
 };
 
 export const insightApi = {
-  getAll: (params?: { page?: number; symbol?: string }) =>
+  getTodos: (params?: { page?: number; symbol?: string }) =>
     api.get('/insights', { params }),
   getLatest: () => api.get('/insights/latest'),
 };
 
 export const alertApi = {
-  getAll: () => api.get('/alerts'),
+  getTodos: () => api.get('/alerts'),
   create: (data: any) => api.post('/alerts', data),
   delete: (id: string) => api.delete(`/alerts/${id}`),
   toggle: (id: string) => api.patch(`/alerts/${id}/toggle`),
@@ -69,9 +69,9 @@ export const subscriptionApi = {
 };
 
 export const scoresApi = {
-  getAll:              ()              => api.get('/scores'),
+  getTodos:              ()              => api.get('/scores'),
   getBySymbol:         (s: string)    => api.get(`/scores/${s}`),
-  getHistory:          (s: string, l = 50) => api.get(`/scores/${s}/history?limit=${l}`),
+  getHistórico:          (s: string, l = 50) => api.get(`/scores/${s}/history?limit=${l}`),
   getLeaderboardRisk:  (l = 10)       => api.get(`/scores/leaderboard/risk?limit=${l}`),
   getLeaderboardOpp:   (l = 10)       => api.get(`/scores/leaderboard/opportunity?limit=${l}`),
 };
