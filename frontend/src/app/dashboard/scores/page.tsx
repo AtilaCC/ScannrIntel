@@ -90,18 +90,6 @@ export default function ScoresPage() {
   const { user }    = useAuthStore();
   const plan        = (user as any)?.plan ?? 'FREE';
 
-  // Gate: FREE users see upgrade prompt
-  if (plan === 'FREE') {
-    return (
-      <div className="p-6">
-        <UpgradePrompt
-          feature="Token Scores"
-          requiredPlan="PRO"
-          currentPlan="FREE"
-        />
-      </div>
-    );
-  }
   const [scores,      setScores]      = useState<TokenScoreRow[]>([]);
   const [riskLeader,  setRiskLeader]  = useState<LeaderEntry[]>([]);
   const [oppLeader,   setOppLeader]   = useState<LeaderEntry[]>([]);
@@ -137,6 +125,19 @@ export default function ScoresPage() {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // Gate: FREE users see upgrade prompt
+  if (plan === 'FREE') {
+    return (
+      <div className="p-6">
+        <UpgradePrompt
+          feature="Token Scores"
+          requiredPlan="PRO"
+          currentPlan="FREE"
+        />
+      </div>
+    );
+  }
 
   // ── Sorting ───────────────────────────────────────────────
   const handleSort = (field: SortField) => {
