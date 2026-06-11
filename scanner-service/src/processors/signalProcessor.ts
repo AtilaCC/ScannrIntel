@@ -5,7 +5,7 @@
 // accumulation/dump patterns, and liquidity anomalies.
 // ============================================================
 
-import { createLogger } from '../utils/shared';
+import { createLogger } from '../utils/constants';
 
 const logger = createLogger('signal-processor');
 

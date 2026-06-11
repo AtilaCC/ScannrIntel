@@ -4,7 +4,7 @@
 // filters for high-impact macro events.
 // ============================================================
 
-import { createLogger } from '../utils/shared';
+import { createLogger } from '../utils/constants';
 
 const logger = createLogger('news-processor');
 

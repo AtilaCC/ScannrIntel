@@ -4,7 +4,7 @@
 // Set WHALE_ALERT_API_KEY env var to activate.
 // ============================================================
 
-import { createLogger } from '../utils/shared';
+import { createLogger } from '../utils/constants';
 
 const logger = createLogger('whale-alert');
 
