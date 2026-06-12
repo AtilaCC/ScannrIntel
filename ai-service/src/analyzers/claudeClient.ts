@@ -26,7 +26,7 @@ export class ClaudeClient {
 
   constructor(private readonly apiKey: string) {}
 
-  async complete(req: ClaudeRequest): Promise<ClaudeResponse> {
+  async complete(req: { system?: string; userMessage: string; maxTokens?: number; temperature?: number }): Promise<{ content: string; usage: TokenUsage; model: string; stopReason: string }> {
     const t0 = Date.now();
     this.requestCount++;
 
@@ -75,10 +75,40 @@ export class ClaudeClient {
         usage,
         model: 'llama-3.3-70b-versatile',
         stopReason: data.choices[0]?.finish_reason || 'stop',
-      };
+      } as any;
     } finally {
       clearTimeout(timeout);
     }
+  }
+
+  // Compatibility method for claudeAnalyzer (maps old Anthropic interface to Groq)
+  async request(req: any): Promise<{ response: any; usage: any; latencyMs: number }> {
+    const t0 = Date.now();
+    // Extract user message from messages array
+    const userMsg = req.messages?.find((m: any) => m.role === 'user')?.content ?? '';
+    const systemMsg = req.system ?? '';
+
+    const result = await this.complete({
+      system:     systemMsg,
+      userMessage: typeof userMsg === 'string' ? userMsg : JSON.stringify(userMsg),
+      maxTokens:  req.max_tokens ?? 1024,
+      temperature: req.temperature ?? 0.2,
+    });
+
+    return {
+      response: {
+        content: [{ type: 'text', text: result.content }],
+        usage:   { input_tokens: result.usage.inputTokens, output_tokens: result.usage.outputTokens },
+        model:   result.model,
+        stop_reason: result.stopReason,
+      },
+      usage: result.usage,
+      latencyMs: Date.now() - t0,
+    };
+  }
+
+  get stats() {
+    return this.getStats();
   }
 
   getStats() {
