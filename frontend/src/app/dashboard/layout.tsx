@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         break;
       }
       case 'signals':
-        if (payload) { addSignal(payload); toast.info(`📡 ${payload.type} on ${payload.symbol}`, { duration: 4000 }); }
+        if (payload) { addSignal(payload); toast.info(`📡 ${payload.type ?? payload.signalType ?? "SINAL"} em ${payload.symbol ?? "mercado"}`, { duration: 4000 }); }
         break;
       case 'ai_insights':
         if (payload) { addInsight(payload); toast.success(`🤖 AI insight: ${payload.symbol}`, { duration: 5000 }); }

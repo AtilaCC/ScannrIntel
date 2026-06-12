@@ -41,7 +41,7 @@ const EXAMPLES = [
   {
     label: '🐋 Alerta de Baleia',
     type: 'MARKET_SIGNAL' as SignalType,
-    text: '🚨 BALEIA ALERT: 4,200 BTC ($287M) transferred from unknown wallet to Coinbase. Confirmed 3 minutos ago. BTC flat at $68,400, volume 1.2x average.',
+    text: '🚨 ALERTA DE BALEIA: 4,200 BTC ($287M) transferred from unknown wallet to Coinbase. Confirmado há 3 minutos. BTC flat at $68,400, volume 1.2x average.',
   },
   {
     label: '📰 Notícia do Fed',
@@ -51,7 +51,7 @@ const EXAMPLES = [
   {
     label: '🐦 Tweet do Elon',
     type: 'SOCIAL_SPIKE' as SignalType,
-    text: 'Elon Musk just tweeted "Doge 🚀🌕". Posted 2 minutos ago, 45k likes. DOGE at $0.142, volume up 3.4x in last 15 minutos.',
+    text: 'Elon Musk just tweeted "Doge 🚀🌕". Postado há 2 minutos, 45k likes. DOGE at $0.142, volume up 3.4x in last 15 minutos.',
   },
   {
     label: '📋 Nova Listagem',

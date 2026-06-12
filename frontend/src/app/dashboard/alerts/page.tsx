@@ -271,7 +271,7 @@ export default function AlertsPage() {
                 <div>
                   <p className="text-text-primary text-sm">{alert.message}</p>
                   <p className="text-text-muted text-xs font-mono mt-1">
-                    {alert.createdAt ? formatDistanceToNow(new Date(alert.createdAt), { addSuffix: true }) : 'just now'}
+                    {alert.createdAt ? formatDistanceToNow(new Date(alert.createdAt), { addSuffix: true }) : 'agora mesmo'}
                   </p>
                 </div>
               </div>

@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, TrendingUp, TrendingDown, BarChart2, Fish } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const SIGNAL_ICONS: Record<string, any> = {
   BALEIA_TRADE: Fish,
@@ -80,8 +81,8 @@ export function SignalFeed({ signals }: SignalFeedProps) {
                   )}
                   <div className="text-text-muted text-xs mt-1 font-mono opacity-60">
                     {signal.createdAt
-                      ? formatDistanceToNow(new Date(signal.createdAt), { addSuffix: true })
-                      : 'just now'}
+                      ? formatDistanceToNow(new Date(signal.createdAt), { addSuffix: true, locale: ptBR })
+                      : 'agora mesmo'}
                   </div>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface AIInsightsFeedProps {
   insights: any[];
@@ -56,8 +57,8 @@ function InsightCard({ insight }: { insight: any }) {
               </span>
               <span className="text-text-muted text-xs font-mono ml-auto">
                 {insight.createdAt
-                  ? formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true })
-                  : 'just now'}
+                  ? formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ptBR })
+                  : 'agora mesmo'}
               </span>
             </div>
             <p className="text-text-primary text-sm leading-relaxed">{insight.summary}</p>

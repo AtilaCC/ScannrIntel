@@ -71,7 +71,7 @@ export default function NewsPage() {
     if (m < 60)  return `${m}min atrás`;
     const h = Math.floor(m / 60);
     if (h < 24)  return `${h}h atrás`;
-    return `${Math.floor(h / 24)}d atrás`;
+    return `${Math.floor(h / 24)}dias atrás`;
   }
 
   return (
