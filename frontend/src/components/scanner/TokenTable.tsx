@@ -12,16 +12,16 @@ interface TokenTableProps {
   liveTickers: Record<string, MarketTicker>;
 }
 
-type OrdenarKey = 'symbol' | 'price' | 'priceChangePercent24h' | 'quoteVolume24h';
+type SortKey = 'symbol' | 'price' | 'priceChangePercent24h' | 'quoteVolume24h';
 
 export function TokenTable({ tokens, liveTickers }: TokenTableProps) {
-  const [sortKey, setOrdenarKey] = useState<OrdenarKey>('quoteVolume24h');
-  const [sortDir, setOrdenarDir] = useState<'asc' | 'desc'>('desc');
+  const [sortKey, setSortKey] = useState<SortKey>('quoteVolume24h');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
 
-  const handleOrdenar = (key: OrdenarKey) => {
-    if (sortKey === key) setDir((d) => d === 'asc' ? 'desc' : 'asc');
-    else { setOrdenarKey(key); setOrdenarDir('desc'); }
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) setSortDir((d) => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('desc'); }
   };
 
   // Merge static token list with live prices
@@ -55,7 +55,7 @@ export function TokenTable({ tokens, liveTickers }: TokenTableProps) {
     } catch { toast.error('Falha ao atualizar watchlist'); }
   };
 
-  const setDir = setOrdenarDir;
+  const setDir = setSortDir;
 
   return (
     <div className="overflow-auto max-h-96">
@@ -70,7 +70,7 @@ export function TokenTable({ tokens, liveTickers }: TokenTableProps) {
             ].map(({ key, label }) => (
               <th
                 key={key}
-                onClick={() => handleOrdenar(key as OrdenarKey)}
+                onClick={() => handleSort(key as SortKey)}
                 className="px-4 py-3 text-left text-text-muted font-mono text-xs cursor-pointer hover:text-text-secondary select-none"
               >
                 <div className="flex items-center gap-1">

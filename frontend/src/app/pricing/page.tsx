@@ -228,7 +228,7 @@ export default function PricingPage() {
         <div className="flex items-center gap-4">
           <Link href="/auth/login"
             className="text-text-secondary hover:text-text-primary text-sm transition-colors">
-            Sign in
+            Entrar
           </Link>
           <Link href="/auth/register"
             className="px-4 py-2 bg-accent-cyan text-bg-primary rounded-lg text-sm font-bold hover:bg-accent-cyan/90 transition-all">

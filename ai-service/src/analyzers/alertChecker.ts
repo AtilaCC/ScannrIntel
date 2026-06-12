@@ -132,7 +132,7 @@ export class AlertChecker {
 
       // Publish for real-time UI notification
       await this.redis.publish(
-        REDIS_CHANNELS.ALERTS,
+        'alerts',
         JSON.stringify({
           type:      'alert_triggered',
           payload:   { ...triggered, userId: alert.userId },
