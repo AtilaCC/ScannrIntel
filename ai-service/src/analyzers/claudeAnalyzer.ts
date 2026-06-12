@@ -154,6 +154,20 @@ export class ClaudeAnalyzer {
         // ── 8. Persist insight to DB ───────────────────────
         const insightId = generateId();
 
+        // Ensure Token row exists (FK constraint signals_symbol_fk → tokens)
+        const baseAsset  = signal.symbol.replace('USDT', '').replace('BTC', '').replace('ETH', '') || signal.symbol;
+        const quoteAsset = signal.symbol.includes('USDT') ? 'USDT' : signal.symbol.includes('BTC') ? 'BTC' : 'ETH';
+        await this.prisma.token.upsert({
+          where:  { symbol: signal.symbol },
+          update: {},
+          create: {
+            symbol:     signal.symbol,
+            baseAsset:  signal.symbol.replace('USDT','').replace('BTC','').replace('ETH','') || signal.symbol,
+            quoteAsset: signal.symbol.includes('USDT') ? 'USDT' : 'BTC',
+            network:    'binance',
+          },
+        });
+
         // Ensure Signal row exists (FK constraint on ai_insights_signal_id_fkey)
         await this.prisma.signal.upsert({
           where:  { id: signalId },
