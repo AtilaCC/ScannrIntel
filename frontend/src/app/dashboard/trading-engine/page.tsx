@@ -17,17 +17,17 @@ type SignalType = 'NEWS_SIGNAL' | 'MACRO_EVENT' | 'SOCIAL_SPIKE' | 'MARKET_SIGNA
 
 interface TradingDecision {
   id: string;
-  symbol: string;
-  eventType: SignalType;
-  sentiment: 'ALTISTA' | 'BAIXISTA' | 'NEUTRO';
-  action: 'BUY' | 'SELL' | 'HOLD';
-  entryType: 'EARLY' | 'CONFIRMATION' | 'LATE';
+  symbol?: string;
+  eventType?: SignalType;
+  sentiment: string;
+  action: string;
+  entryType?: string;
   summary: string;
   riskScore: number;
   opportunityScore: number;
   confidence: number;
   riskRewardRatio: number;
-  timeHorizon: 'SHORT' | 'MID' | 'LONG';
+  timeHorizon?: string;
   expectedMoveWindow: string;
   keyDrivers: string[];
   analysis: string;
@@ -163,7 +163,7 @@ function RRBar({ ratio }: { ratio: number }) {
 
 function DecisionCard({ d }: { d: TradingDecision }) {
   const am  = actionMeta(d.action);
-  const em  = entryMeta(d.entryType);
+  const em  = entryMeta(d.entryType ?? '');
   const ActionIcon = am.icon;
 
   return (
@@ -193,7 +193,7 @@ function DecisionCard({ d }: { d: TradingDecision }) {
               <span className="text-text-muted">·</span>
               <span className={`text-[10px] px-2 py-0.5 rounded font-mono font-semibold ${em.color}`}>{em.label}</span>
               <span className="text-text-muted">·</span>
-              <span className="text-xs text-text-muted font-mono">{d.eventType.replace('_', ' ')}</span>
+              <span className="text-xs text-text-muted font-mono">{(d.eventType ?? '').replace('_', ' ')}</span>
             </div>
           </div>
         </div>
@@ -208,25 +208,25 @@ function DecisionCard({ d }: { d: TradingDecision }) {
 
       {/* Summary */}
       <p className="text-sm text-text-secondary leading-relaxed border-l-2 border-white/10 pl-3">
-        {d.summary}
+        {d.summary ?? d.reasoning ?? d.analysis ?? ''}
       </p>
 
       {/* Scores */}
       <div className="flex justify-around py-3 bg-black/20 rounded-lg border border-white/5">
         <ScoreRing value={d.riskScore}        color={scoreColor(d.riskScore)}       label="Risco"        />
         <ScoreRing value={d.opportunityScore} color={oppColor(d.opportunityScore)}   label="Oportunidade" />
-        <ScoreRing value={d.confidence}       color="#6688ff"                        label="Confidence"  />
+        <ScoreRing value={d.confidence}       color="#6688ff"                        label="Confiança"  />
       </div>
 
       {/* RR */}
       <RRBar ratio={d.riskRewardRatio} />
 
       {/* Key drivers */}
-      {d.keyDrivers.length > 0 && (
+      {(d.keyDrivers?.length ?? 0) > 0 && (
         <div className="space-y-2">
-          <span className="text-[10px] uppercase tracking-widest text-text-muted">Key Drivers</span>
+          <span className="text-[10px] uppercase tracking-widest text-text-muted">Fatores Principais</span>
           <div className="flex flex-wrap gap-2">
-            {d.keyDrivers.map((drv, i) => (
+            {(d.keyDrivers ?? []).map((drv, i) => (
               <span key={i} className="text-xs px-2.5 py-1 rounded-md bg-bg-tertiary text-text-secondary border border-bg-border">
                 {drv}
               </span>
@@ -256,7 +256,7 @@ function HistoryRow({ d, onClick }: { d: TradingDecision; onClick: () => void })
     >
       <span className={`font-mono font-bold text-xs w-9 flex-shrink-0 ${am.color}`}>{d.action}</span>
       <span className="font-semibold text-sm text-text-primary w-14 flex-shrink-0">{d.symbol}</span>
-      <span className="text-xs text-text-muted flex-1 truncate">{d.summary}</span>
+      <span className="text-xs text-text-muted flex-1 truncate">{d.summary ?? d.reasoning ?? d.analysis ?? ''}</span>
       <div className="flex gap-3 flex-shrink-0 font-mono text-[10px]">
         <span style={{ color: scoreColor(d.riskScore) }}>R:{d.riskScore}</span>
         <span style={{ color: oppColor(d.opportunityScore) }}>O:{d.opportunityScore}</span>
