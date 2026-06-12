@@ -33,7 +33,7 @@ interface TokenScoreRow {
 interface LeaderEntry { rank: number; symbol: string; score: number; sentiment: string; }
 
 type ViewMode  = 'grid' | 'ranking';
-type OrdenarField = 'risk' | 'opportunity' | 'symbol';
+type SortField = 'risk' | 'opportunity' | 'symbol';
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -91,12 +91,12 @@ export default function ScoresPage() {
   const plan        = (user as any)?.plan ?? 'FREE';
 
   const [scores,      setScores]      = useState<TokenScoreRow[]>([]);
-  const [riskLeader,  setRiscoLeader]  = useState<LeaderEntry[]>([]);
+  const [riskLeader,  setRiskLeader]  = useState<LeaderEntry[]>([]);
   const [oppLeader,   setOppLeader]   = useState<LeaderEntry[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [view,        setView]        = useState<ViewMode>('grid');
-  const [sortField,   setOrdenarField]   = useState<OrdenarField>('risk');
-  const [sortDir,     setOrdenarDir]     = useState<'asc' | 'desc'>('desc');
+  const [sortField,   setSortField]   = useState<SortField>('risk');
+  const [sortDir,     setSortDir]     = useState<'asc' | 'desc'>('desc');
   const [selected,    setSelected]    = useState<TokenScoreRow | null>(null);
   const [filterSentiment, setFilterSentiment] = useState<string>('Todos');
 
@@ -115,7 +115,7 @@ export default function ScoresPage() {
         .map((d: any) => ({ symbol: d.symbol, ...d.score }));
 
       setScores(rows);
-      setRiscoLeader(riskRes.data.data || []);
+      setRiskLeader(riskRes.data.data || []);
       setOppLeader(oppRes.data.data  || []);
     } catch (err) {
       toast.error('Falha ao carregar pontuações');
@@ -140,9 +140,9 @@ export default function ScoresPage() {
   }
 
   // ── Ordenaring ───────────────────────────────────────────────
-  const handleOrdenar = (field: OrdenarField) => {
-    if (sortField === field) setOrdenarDir((d) => d === 'asc' ? 'desc' : 'asc');
-    else { setOrdenarField(field); setOrdenarDir('desc'); }
+  const handleSort = (field: SortField) => {
+    if (sortField === field) setSortDir((d) => d === 'asc' ? 'desc' : 'asc');
+    else { setSortField(field); setSortDir('desc'); }
   };
 
   const sorted = [...scores]
@@ -237,7 +237,7 @@ export default function ScoresPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20 text-text-muted">
           <RefreshCw className="w-6 h-6 animate-spin mr-3" />
-          Loading scores...
+          Carregando pontuações...
         </div>
       ) : (
         <>
@@ -253,10 +253,10 @@ export default function ScoresPage() {
                 </div>
                 {/* Ordenar controls */}
                 <div className="flex gap-2">
-                  {(['risk', 'opportunity', 'symbol'] as OrdenarField[]).map((f) => (
+                  {(['risk', 'opportunity', 'symbol'] as SortField[]).map((f) => (
                     <button
                       key={f}
-                      onClick={() => handleOrdenar(f)}
+                      onClick={() => handleSort(f)}
                       className={`px-2 py-1 rounded text-xs font-mono flex items-center gap-1 transition-all ${
                         sortField === f
                           ? 'text-accent-cyan bg-accent-cyan/10'
