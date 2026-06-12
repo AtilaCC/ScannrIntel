@@ -13,6 +13,7 @@
 
 import { scannerConfig, env } from './config';
 import { fetchAllUSDTPairs } from './utils/constants';
+import { fetchCoinGeckoTickers } from './streams/coinGeckoClient';
 import { BinanceStreamManager } from './streams/binanceStreamManager';
 import { RedisPublisher } from './streams/redisPublisher';
 import { binanceRest } from './streams/binanceRestClient';
@@ -223,6 +224,30 @@ async function bootstrap() {
     }
   }, 30_000); // every 30s
 
+  // ── CoinGecko price feed (every 60s) ──────────────────────
+  const coinGeckoInterval = setInterval(async () => {
+    try {
+      const tickers = await fetchCoinGeckoTickers();
+      for (const t of tickers) {
+        await redisPublisher!.publishMarketData('ticker', {
+          symbol:                t.symbol,
+          price:                 t.price,
+          priceChangePercent24h: t.priceChangePercent24h,
+          quoteVolume24h:        t.volume24h,
+          high24h:               t.high24h,
+          low24h:                t.low24h,
+          openPrice:             t.price * (1 - t.priceChangePercent24h / 100),
+          volume:                t.volume24h,
+          timestamp:             t.timestamp,
+          source:                'coingecko',
+        });
+      }
+      logger.info('CoinGecko data published', { count: tickers.length });
+    } catch (err: any) {
+      logger.error('CoinGecko interval error', { error: err.message });
+    }
+  }, 60_000); // every 60s
+
   // ── 9. Health / metrics HTTP server ──────────────────────
   createHealthServer(
     env.PORT,
@@ -243,6 +268,7 @@ async function bootstrap() {
     logger.info(`${signal} received — shutting down scanner...`);
     clearInterval(snapshotInterval);
     clearInterval(processorInterval);
+    clearInterval(coinGeckoInterval);
 
     if (streamManager) {
       await streamManager.stop();
