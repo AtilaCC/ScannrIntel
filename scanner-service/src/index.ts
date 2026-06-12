@@ -12,6 +12,7 @@
 // ============================================================
 
 import { scannerConfig, env } from './config';
+import { fetchAllUSDTPairs } from './utils/constants';
 import { BinanceStreamManager } from './streams/binanceStreamManager';
 import { RedisPublisher } from './streams/redisPublisher';
 import { binanceRest } from './streams/binanceRestClient';
@@ -55,7 +56,15 @@ async function bootstrap() {
   logger.info('Waiting for Redis...');
   await redisPublisher.waitReady(15_000);
 
-  // ── 2. Validate symbols ───────────────────────────────────
+  // ── 2. Auto-discover symbols if SCAN_SYMBOLS not set ────────
+  if (!process.env.SCAN_SYMBOLS) {
+    const maxPairs = parseInt(process.env.MAX_PAIRS || '300', 10);
+    logger.info(`Auto-discovering up to ${maxPairs} USDT pairs from Binance.us...`);
+    const discovered = await fetchAllUSDTPairs(maxPairs);
+    if (discovered.length > 0) scannerConfig.symbols = discovered;
+  }
+
+  // ── 3. Validate symbols ───────────────────────────────────
   logger.info('Validating symbols against Binance exchange info...');
   const validSymbols = await binanceRest.validateSymbols(scannerConfig.symbols);
 

@@ -36,7 +36,7 @@ export const env = {
 
 export const scannerConfig: ScannerConfig = {
   symbols:                   parseSymbols(),
-  batchSize:                 parseInt(process.env.STREAM_BATCH_SIZE  || '50',     10),
+  batchSize:                 parseInt(process.env.STREAM_BATCH_SIZE  || '100',    10),
   minTradeUsdThreshold:      parseInt(process.env.MIN_TRADE_USD      || '10000',  10),
   enableKlineStreams:         process.env.ENABLE_KLINE_STREAMS        !== 'false',
   enableBookTickerStreams:    process.env.ENABLE_BOOK_TICKER_STREAMS  !== 'false',
