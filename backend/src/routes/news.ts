@@ -25,7 +25,10 @@ async function fetchNews(filter = 'hot') {
   const now = Date.now();
   if (now - lastFetch < CACHE_TTL && cache.length) return cache;
   try {
-    const res = await fetch(`https://cryptopanic.com/api/v1/posts/?auth_token=${CRYPTOPANIC_KEY}&filter=${filter}&public=true`);
+    const url = CRYPTOPANIC_KEY && CRYPTOPANIC_KEY !== "free"
+      ? `https://cryptopanic.com/api/v1/posts/?auth_token=${CRYPTOPANIC_KEY}&filter=${filter}&public=true`
+      : `https://cryptopanic.com/api/v1/posts/?auth_token=free&filter=${filter}&public=true`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) return cache;
     const data = await res.json() as any;
     cache = (data.results ?? []).map((item: any) => {

@@ -172,12 +172,16 @@ export function createSubscriptionRouter(prisma: PrismaClient, redis: Redis) {
     }
 
     try {
-      // In production with stripe installed:
-      // const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY!);
-      // const event   = stripe.webhooks.constructEvent(req.body, sig, secret);
-
-      // Mock: parse body directly (development)
-      const event = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      // Verify webhook signature
+      const stripeKey = process.env.STRIPE_SECRET_KEY;
+      let event: any;
+      if (stripeKey && sig) {
+        const Stripe = (await import('stripe')).default;
+        const stripe = new Stripe(stripeKey, { apiVersion: '2024-04-10' as any });
+        event = stripe.webhooks.constructEvent(req.body, sig, secret);
+      } else {
+        event = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      }
 
       logger.info('Stripe webhook received', { type: event.type });
 
