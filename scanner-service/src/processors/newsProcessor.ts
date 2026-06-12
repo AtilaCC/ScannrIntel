@@ -74,7 +74,7 @@ export async function fetchCryptoNews(filter: 'rising' | 'hot' | 'bullish' | 'be
 
     const res = await fetch(`${BASE_URL}/posts/?${params}`);
     if (!res.ok) {
-      logger.error('CryptoPanic API error', { status: res.status });
+      if (res.status !== 404) logger.warn('CryptoPanic API error', { status: res.status });
       return cachedNews;
     }
 
