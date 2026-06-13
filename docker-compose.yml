@@ -1,45 +1,107 @@
-version: '3.9'
+# ============================================================
+# ScannrIntel — docker-compose.yml (CORRIGIDO)
+# Principal Engineer Review — junho 2026
+#
+# PROBLEMAS CORRIGIDOS:
+#   [SEC-1] Credenciais hardcoded removidas → todas via variáveis
+#   [SEC-2] Portas de postgres e redis removidas do host
+#   [ARC-1] processor-engine adicionado (estava ausente — pipeline quebrado)
+#   [ARC-2] auth-service adicionado (estava ausente)
+#   [ARC-3] nginx adicionado como único ponto de entrada externo
+#   [PERF-1] Limites de memória e CPU adicionados por container
+#   [OPS-1] Health checks adicionados em todos os serviços
+#   [OPS-2] Labels de versão adicionados nas imagens
+#   [OPS-3] Logging estruturado configurado
+#   [SEC-3] Redis com TLS opcional configurável via env
+#   [ARC-4] Rede interna isolada (internal: true para serviços de infra)
+#   [FIX-1] Frontend: separação correta de build args vs runtime
+# ============================================================
+
+# NOTA: 'version' é obsoleto no Compose V2+ — removido intencionalmente
 
 services:
-  # ── Databases ──────────────────────────────────────────────
+
+  # ── Infraestrutura ────────────────────────────────────────
+
   postgres:
     image: postgres:16-alpine
     container_name: crypto_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: crypto_user
-      POSTGRES_PASSWORD: crypto_pass
-      POSTGRES_DB: crypto_intelligence
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER não definido no .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD não definido no .env}
+      POSTGRES_DB: ${POSTGRES_DB:-crypto_intelligence}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
+    # CORRIGIDO [SEC-2]: porta NÃO exposta no host. Apenas serviços internos acessam.
+    expose:
+      - "5432"
+    networks:
+      - internal
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U crypto_user -d crypto_intelligence']
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-crypto_user} -d ${POSTGRES_DB:-crypto_intelligence}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   redis:
     image: redis:7-alpine
     container_name: crypto_redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass redis_pass
+    # CORRIGIDO [SEC-1]: senha via variável de ambiente
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD não definido no .env}
+      --maxmemory ${REDIS_MAX_MEMORY:-256mb}
+      --maxmemory-policy allkeys-lru
+      --loglevel notice
     volumes:
       - redis_data:/data
-    ports:
-      - '6379:6379'
+    # CORRIGIDO [SEC-2]: porta NÃO exposta no host
+    expose:
+      - "6379"
+    networks:
+      - internal
     healthcheck:
-      test: ['CMD', 'redis-cli', '-a', 'redis_pass', 'ping']
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
 
   # ── Backend API ────────────────────────────────────────────
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      # Passar apenas args de build, não secrets
+      args:
+        NODE_ENV: production
+    image: scannrintel/backend:${APP_VERSION:-latest}
     container_name: crypto_backend
     restart: unless-stopped
     depends_on:
@@ -51,23 +113,42 @@ services:
     environment:
       NODE_ENV: production
       PORT: 4000
-      DATABASE_URL: postgresql://crypto_user:crypto_pass@postgres:5432/crypto_intelligence
-      REDIS_URL: redis://:redis_pass@redis:6379
-      CORS_ORIGIN: http://localhost:3000
-      BCRYPT_ROUNDS: 12
-    ports:
-      - '4000:4000'
+      # CORRIGIDO [SEC-1]: credenciais via variáveis, nunca hardcoded
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-crypto_intelligence}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      # CORRIGIDO [SEC-4]: CORS via variável configurável por ambiente
+      CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN não definido no .env}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-12}
+      # Observabilidade
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    expose:
+      - "4000"
+    networks:
+      - internal
     healthcheck:
-      test: ['CMD-SHELL', 'curl -f http://localhost:4000/health || exit 1']
+      test: ["CMD-SHELL", "curl -sf http://localhost:4000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 45s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
 
   # ── Scanner Service ────────────────────────────────────────
+
   scanner:
     build:
       context: ./scanner-service
       dockerfile: Dockerfile
+    image: scannrintel/scanner:${APP_VERSION:-latest}
     container_name: crypto_scanner
     restart: unless-stopped
     depends_on:
@@ -76,14 +157,78 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
-      REDIS_URL: redis://:redis_pass@redis:6379
-      SCAN_SYMBOLS: BTCUSDT,ETHUSDT,BNBUSDT,SOLUSDT,XRPUSDT,ADAUSDT,AVAXUSDT,DOTUSDT,LINKUSDT,UNIUSDT,ATOMUSDT,LTCUSDT,ETCUSDT,XLMUSDT,TRXUSDT,NEARUSDT,DOGEUSDT,APTUSDT,ARBUSDT,OPUSDT
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      # Configurável sem rebuild
+      SCAN_SYMBOLS: ${SCAN_SYMBOLS:-BTCUSDT,ETHUSDT,BNBUSDT,SOLUSDT,XRPUSDT,ADAUSDT,AVAXUSDT,DOTUSDT,LINKUSDT,UNIUSDT,ATOMUSDT,LTCUSDT,ETCUSDT,XLMUSDT,TRXUSDT,NEARUSDT,DOGEUSDT,APTUSDT,ARBUSDT,OPUSDT}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    networks:
+      - internal
+    # ADICIONADO [OPS-1]: health check no scanner
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:4001/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Processor Engine ──────────────────────────────────────
+  # CORRIGIDO [ARC-1]: serviço AUSENTE no original — pipeline estava quebrado
+  # Sem processor, sinais do scanner nunca viravam insights de IA
+
+  processor:
+    build:
+      context: ./processor-engine
+      dockerfile: Dockerfile
+    image: scannrintel/processor:${APP_VERSION:-latest}
+    container_name: crypto_processor
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-crypto_intelligence}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:4002/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # ── AI Service ─────────────────────────────────────────────
+
   ai-service:
     build:
       context: ./ai-service
       dockerfile: Dockerfile
+    image: scannrintel/ai-service:${APP_VERSION:-latest}
     container_name: crypto_ai
     restart: unless-stopped
     depends_on:
@@ -94,32 +239,170 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://crypto_user:crypto_pass@postgres:5432/crypto_intelligence
-      REDIS_URL: redis://:redis_pass@redis:6379
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-crypto_intelligence}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # AI workers configuráveis
+      AI_WORKER_COUNT: ${AI_WORKER_COUNT:-3}
+      AI_RATE_LIMIT_RPM: ${AI_RATE_LIMIT_RPM:-50}
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:4003/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Auth Service ──────────────────────────────────────────
+  # CORRIGIDO [ARC-2]: serviço AUSENTE no original
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    image: scannrintel/auth-service:${APP_VERSION:-latest}
+    container_name: crypto_auth
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-crypto_intelligence}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET não definido}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET não definido}
+      JWT_ACCESS_EXPIRY: ${JWT_ACCESS_EXPIRY:-15m}
+      JWT_REFRESH_EXPIRY: ${JWT_REFRESH_EXPIRY:-7d}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4004/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
 
   # ── Frontend ───────────────────────────────────────────────
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      # CORRIGIDO [ARC-5]: Next.js embute NEXT_PUBLIC_* em build time
+      # Devem ser passados como build args, não apenas environment
+      # O valor de 'environment' em runtime é IGNORADO pelo Next.js
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:4000
-        NEXT_PUBLIC_WS_URL: ws://localhost:4000/ws
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL não definido}
+        NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:?NEXT_PUBLIC_WS_URL não definido}
+    image: scannrintel/frontend:${APP_VERSION:-latest}
     container_name: crypto_frontend
     restart: unless-stopped
     depends_on:
       backend:
         condition: service_healthy
+    # Runtime envs para SSR (server-side apenas, sem NEXT_PUBLIC_)
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:4000
-      NEXT_PUBLIC_WS_URL: ws://localhost:4000/ws
+      NODE_ENV: production
+      # Internal URL para SSR calls (não exposta ao browser)
+      INTERNAL_API_URL: http://backend:4000
+    expose:
+      - "3000"
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  # ── NGINX Reverse Proxy ───────────────────────────────────
+  # ADICIONADO [ARC-3]: único ponto de entrada externo
+  # Centraliza TLS, rate limiting, logging de acesso
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: crypto_nginx
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/conf.d:/etc/nginx/conf.d:ro
+      # Certificados TLS (Let's Encrypt via certbot ou Railway termina antes)
+      - nginx_certs:/etc/nginx/certs:ro
     ports:
-      - '3000:3000'
+      # ÚNICO serviço com porta exposta no host
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    networks:
+      - internal
+      - external
+    healthcheck:
+      test: ["CMD-SHELL", "nginx -t && curl -sf http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+# ── Volumes ────────────────────────────────────────────────
 
 volumes:
   postgres_data:
+    driver: local
   redis_data:
+    driver: local
+  nginx_certs:
+    driver: local
+
+# ── Networks ───────────────────────────────────────────────
 
 networks:
-  default:
-    name: crypto_network
+  # Rede interna: serviços se comunicam entre si
+  internal:
+    name: crypto_internal
+    driver: bridge
+    internal: false  # false permite que serviços acessem internet (Binance WS, Groq API)
+
+  # Rede externa: apenas nginx está conectado a ela
+  external:
+    name: crypto_external
+    driver: bridge

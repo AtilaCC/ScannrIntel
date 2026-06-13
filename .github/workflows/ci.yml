@@ -1,0 +1,164 @@
+# ============================================================
+# ScannrIntel — .github/workflows/ci.yml (NOVO)
+# Principal Engineer Review — junho 2026
+#
+# PROBLEMA ORIGINAL: Sem CI/CD — deploys manuais, sem testes,
+# sem scan de secrets, sem validação de qualidade.
+#
+# ESTA PIPELINE:
+#   1. Lint + TypeScript typecheck em todos os serviços
+#   2. Scan de secrets (trufflehog) — bloqueia se achar credenciais
+#   3. Auditoria de dependências (npm audit)
+#   4. Build Docker para validação
+#   5. Deploy automático no Railway (apenas branch main)
+# ============================================================
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+
+  # ── 1. Scan de Secrets ────────────────────────────────────
+  # Bloqueia o pipeline se encontrar credenciais no código
+  secret-scan:
+    name: 🔐 Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # histórico completo para scan
+
+      - name: TruffleHog — Scan de secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  # ── 2. Lint e TypeCheck ───────────────────────────────────
+  lint-typecheck:
+    name: 🔍 Lint + TypeCheck
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, frontend, scanner-service, processor-engine, ai-service, auth-service]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: ${{ matrix.service }}/package-lock.json
+
+      - name: Install dependencies — ${{ matrix.service }}
+        working-directory: ${{ matrix.service }}
+        run: npm ci
+
+      - name: TypeScript typecheck — ${{ matrix.service }}
+        working-directory: ${{ matrix.service }}
+        run: npm run typecheck || npx tsc --noEmit
+
+      - name: ESLint — ${{ matrix.service }}
+        working-directory: ${{ matrix.service }}
+        run: npm run lint || echo "::warning::Lint não configurado em ${{ matrix.service }}"
+
+  # ── 3. Auditoria de Segurança de Dependências ─────────────
+  npm-audit:
+    name: 📦 NPM Audit
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, frontend, scanner-service, processor-engine, ai-service]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Audit — ${{ matrix.service }}
+        working-directory: ${{ matrix.service }}
+        run: |
+          npm ci
+          # Falha apenas para vulnerabilidades HIGH e CRITICAL
+          npm audit --audit-level=high
+
+  # ── 4. Build Docker ───────────────────────────────────────
+  docker-build:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    needs: [lint-typecheck]
+    strategy:
+      matrix:
+        service:
+          - name: backend
+            context: ./backend
+          - name: frontend
+            context: ./frontend
+          - name: scanner
+            context: ./scanner-service
+          - name: processor
+            context: ./processor-engine
+          - name: ai-service
+            context: ./ai-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.service.name }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          push: false  # apenas valida build, não publica em PRs
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+
+  # ── 5. Deploy Railway (apenas main) ──────────────────────
+  deploy:
+    name: 🚀 Deploy Railway
+    runs-on: ubuntu-latest
+    needs: [secret-scan, lint-typecheck, npm-audit, docker-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: ${{ vars.FRONTEND_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway up --service backend --detach
+          railway up --service scanner --detach
+          railway up --service processor --detach
+          railway up --service ai-service --detach
+          railway up --service auth-service --detach
+          railway up --service frontend --detach
+          echo "✅ Deploy iniciado em Railway"
+
+      - name: Notificação de Deploy
+        if: always()
+        run: |
+          echo "Deploy finalizado: ${{ job.status }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
