@@ -27,6 +27,7 @@ import { initSubscriptionMiddleware } from './middleware/subscription';
 import { tradingEngineRouter } from './routes/tradingEngine';
 import { newsRouter } from './routes/news';
 import { startTokenSync } from './services/tokenSyncService';
+import { startScoringService } from './services/scoringService';
 
 import { WSManager } from './services/wsManager';
 import { REDIS_CHANNELS } from './utils/shared';
@@ -73,6 +74,9 @@ async function bootstrap() {
 
   // ── Token sync (Redis → Postgres) ─────────────────────────
   startTokenSync(prisma, redisSubscriber);
+
+  // ── Scoring service ───────────────────────────────────────
+  startScoringService(prisma);
 
   // Init subscription middleware (makes plan resolver available globally)
   initSubscriptionMiddleware(prisma, redis);

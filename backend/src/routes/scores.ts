@@ -34,15 +34,17 @@ router.get('/', authenticate, requirePlan('PRO'), async (req: AuthRequest, res: 
     // For each symbol get latest score
     const latestScores = await prisma.tokenScore.findMany({
       where:   { symbol: { in: symbols } },
-      orderBy: { computedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
       distinct: ['symbol'],
       select: {
-        symbol:          true,
-        riskScore:       true,
-        opportunityScore:true,
-        sentiment:       true,
-        computedAt:      true,
-        factors:         true,
+        symbol:        true,
+        riskScore:     true,
+        overallScore:  true,
+        momentumScore: true,
+        volumeScore:   true,
+        sentimentScore:true,
+        metadata:      true,
+        createdAt:     true,
       },
     });
 
@@ -52,10 +54,20 @@ router.get('/', authenticate, requirePlan('PRO'), async (req: AuthRequest, res: 
     );
 
     // Merge: every symbol gets a score (null if never scored)
-    const data = symbols.map((symbol) => ({
-      symbol,
-      score: scoreMap[symbol] ?? null,
-    }));
+    const data = symbols.map((symbol) => {
+      const s = scoreMap[symbol];
+      const meta = s?.metadata as any ?? {};
+      return {
+        symbol,
+        score: s ? {
+          symbol:          s.symbol,
+          riskScore:       s.riskScore,
+          opportunityScore:meta.opportunityScore ?? s.overallScore,
+          sentiment:       meta.sentiment ?? 'NEUTRAL',
+          computedAt:      s.createdAt,
+        } : null,
+      };
+    });
 
     await cache.set(cacheKey, data, 15); // 15s cache
     res.json({ success: true, data });

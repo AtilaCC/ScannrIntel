@@ -276,7 +276,7 @@ export default function ScoresPage() {
                     <tr className="border-b border-bg-border">
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">PAR</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">PREÇO</th>
-                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">RISK</th>
+                      <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">RISCO</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">OPORTUNIDADE</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">SENTIMENTO</th>
                       <th className="px-4 py-3 text-left text-text-muted font-mono text-xs">ATUALIZADO</th>

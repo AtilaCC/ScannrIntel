@@ -9,11 +9,11 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 
 const CONDITIONS = [
-  { value: 'PREÇO_ABOVE', label: 'Price rises above' },
-  { value: 'PREÇO_BELOW', label: 'Price falls below' },
-  { value: 'PREÇO_CHANGE_PERCENT', label: 'Price change % exceeds' },
-  { value: 'VOLUME_SPIKE_PERCENT', label: 'Volume exceeds (USD)' },
-  { value: 'BALEIA_TRADE_SIZE', label: 'Whale trade size (USD)' },
+  { value: 'PRICE_ABOVE', label: 'Preço sobe acima de' },
+  { value: 'PRICE_BELOW', label: 'Preço cai abaixo de' },
+  { value: 'PREÇO_CHANGE_PERCENT', label: 'Variação de preço % excede' },
+  { value: 'VOLUME_SPIKE_PERCENT', label: 'Volume excede (USD)' },
+  { value: 'WHALE_TRADE_SIZE', label: 'Tamanho de trade baleia (USD)' },
 ];
 
 const SYMBOLS = [
@@ -29,7 +29,7 @@ export default function AlertsPage() {
   const [tab, setTab] = useState<'configs' | 'triggered'>('configs');
   const [form, setForm] = useState({
     symbol: 'BTCUSDT',
-    condition: 'PREÇO_ABOVE',
+    condition: 'PRICE_ABOVE',
     threshold: '',
     channels: ['IN_APP'],
   });
@@ -53,17 +53,17 @@ export default function AlertsPage() {
     e.preventDefault();
     try {
       await alertApi.create({ ...form, threshold: parseFloat(form.threshold) });
-      toast.success('Alert created');
+      toast.success('Alerta criado com sucesso');
       setShowForm(false);
       fetchData();
     } catch { toast.error('Falha ao criar alerta'); }
   };
 
-  const handleExcluir = async (id: string) => {
+  const handleDelete = async (id: string) => {
     try {
       await alertApi.delete(id);
       setConfigs((prev) => prev.filter((c) => c.id !== id));
-      toast.success('Alert deleted');
+      toast.success('Alerta excluído');
     } catch { toast.error('Falha ao excluir alerta'); }
   };
 
@@ -90,14 +90,14 @@ export default function AlertsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-text-primary">Alert System</h1>
-          <p className="text-text-secondary text-sm mt-1">Configure real-time market notifications</p>
+          <p className="text-text-secondary text-sm mt-1">Configure notificações de mercado em tempo real</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-2 px-4 py-2 bg-accent-cyan text-bg-primary rounded-lg font-display font-bold text-sm hover:bg-accent-cyan/90 transition-all shadow-glow-cyan"
         >
           <Plus className="w-4 h-4" />
-          New Alert
+          Novo Alerta
         </button>
       </div>
 
@@ -180,7 +180,7 @@ export default function AlertsPage() {
       {/* Tabs */}
       <div className="flex gap-1 bg-bg-secondary border border-bg-border rounded-lg p-1 w-fit">
         {[
-          { key: 'configs', label: `Configured (${configs.length})` },
+          { key: 'configs', label: `Configurados (${configs.length})` },
           { key: 'triggered', label: `Histórico (${allTriggered.length})` },
         ].map(({ key, label }) => (
           <button
@@ -201,7 +201,7 @@ export default function AlertsPage() {
           {configs.length === 0 && (
             <div className="glass-card rounded-xl p-12 text-center text-text-muted">
               <Bell className="w-10 h-10 mx-auto mb-3 opacity-20" />
-              <p>Nenhum alerta configurado yet</p>
+              <p>Nenhum alerta configurado ainda</p>
             </div>
           )}
           {configs.map((cfg) => (
@@ -238,7 +238,7 @@ export default function AlertsPage() {
                 <button onClick={() => handleToggle(cfg.id)} className="text-text-muted hover:text-accent-cyan">
                   {cfg.isAtivo ? <ToggleRight className="w-5 h-5 text-accent-cyan" /> : <ToggleLeft className="w-5 h-5" />}
                 </button>
-                <button onClick={() => handleExcluir(cfg.id)} className="text-text-muted hover:text-accent-red">
+                <button onClick={() => handleDelete(cfg.id)} className="text-text-muted hover:text-accent-red">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -253,7 +253,7 @@ export default function AlertsPage() {
           {allTriggered.length === 0 && (
             <div className="glass-card rounded-xl p-12 text-center text-text-muted">
               <CheckCheck className="w-10 h-10 mx-auto mb-3 opacity-20" />
-              <p>No triggered alerts yet</p>
+              <p>No triggered alerts ainda</p>
             </div>
           )}
           {allTriggered.map((alert) => (

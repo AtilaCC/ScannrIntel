@@ -34,7 +34,9 @@ tradingEngineRouter.post('/manual', authenticate, requirePlan('PRO'), async (req
         messages: [
           {
             role: 'system',
-            content: `You are an institutional crypto trading decision engine. Analyze market signals and respond ONLY with a valid JSON object. No markdown, no backticks, no explanation. Required JSON:
+            content: `You are an institutional crypto trading decision engine. Analyze market signals and respond ONLY with a valid JSON object. No markdown, no backticks, no explanation.
+CRITICAL: All text values in the JSON must be in Brazilian Portuguese (pt-BR). The "reasoning" and "keyFactors" fields must be in Portuguese.
+Required JSON:
 {
   "action": "BUY | SELL | HOLD | AVOID",
   "confidence": 0-100,
