@@ -1,0 +1,19 @@
+{
+  "name": "processor-engine",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn src/index.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.0.0",
+    "ioredis": "^5.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}
